@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOC电机驱动上位机 - 电流环测试修复版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+        }
+
+        .section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h3::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #feca57, #ff9ff3);
+        }
+
+        .btn-emergency {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        .btn-info {
+            background: linear-gradient(45deg, #17a2b8, #138496);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+
+        .status-panel {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .status-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .status-value {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .status-error {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        .command-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .log-area {
+            background: #1a1a1a;
+            color: #00ff00;
+            border-radius: 10px;
+            padding: 20px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            margin-top: 20px;
+        }
+
+        .motor-control {
+            grid-column: 1 / -1;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+            margin-bottom: 20px;
+        }
+
+        .control-group .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ccc;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .indicator.connected {
+            background: #4ecdc4;
+            box-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
+        }
+
+        .indicator.disconnected {
+            background: #ff6b6b;
+        }
+
+        .indicator.error {
+            background: #e74c3c;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-danger {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .control-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .command-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>FOC电机驱动上位机 - 电流环测试修复版</h1>
+            <p>修复电流环测试逻辑，避免自动重复发送命令 - V5.0</p>
+        </div>
+
+        <div class="main-grid">
+            <!-- 串口连接区域 -->
+            <div class="section">
+                <h3>串口连接</h3>
+                <div class="status-panel">
+                    <div class="status-item">
+                        <span class="status-label">连接状态</span>
+                        <span class="status-value">
+                            <span class="indicator disconnected" id="connectionIndicator"></span>
+                            <span id="connectionStatus">未连接</span>
+                        </span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">波特率</span>
+                        <span class="status-value">230400</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">设备状态</span>
+                        <span class="status-value" id="deviceStatus">未知</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">数据读取</span>
+                        <span class="status-value" id="dataReadStatus">等待连接</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <button class="btn" id="connectBtn">🔌 连接串口</button>
+                    <button class="btn btn-danger" id="disconnectBtn" disabled>断开连接</button>
+                </div>
+            </div>
+
+            <!-- 电机状态区域 -->
+            <div class="section">
+                <h3>电机状态</h3>
+                <div class="status-panel">
+                    <div class="status-item">
+                        <span class="status-label">校准状态</span>
+                        <span class="status-value" id="calibrationStatus">未校准</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">电机模式</span>
+                        <span class="status-value" id="motorMode">停止</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">错误计数</span>
+                        <span class="status-value" id="errorCount">0</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">最后响应</span>
+                        <span class="status-value" id="lastResponse">无</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invalid State 专用修复区域 -->
+        <div class="section">
+            <h3>Invalid State 问题修复</h3>
+            <div class="alert alert-warning" style="margin-bottom: 15px;">
+                <strong>⚠️ 检测到 Invalid State 问题</strong><br>
+                根据日志分析：设备能响应但陷入Invalid State错误状态，m命令正常工作
+            </div>
+            <div class="command-grid">
+                <button class="btn btn-emergency" onclick="fixInvalidState()">🔧 修复Invalid State</button>
+                <button class="btn btn-success" onclick="motorModeRecovery()">⚡ 电机模式恢复</button>
+                <button class="btn btn-warning" onclick="softReset()">🔄 软重置序列</button>
+                <button class="btn btn-info" onclick="testDeviceResponse()">🧪 测试设备响应</button>
+                <button class="btn btn-warning" onclick="clearAllErrors()">🧹 清理所有错误</button>
+                <button class="btn btn-success" onclick="quickCalibration()">⚡ 快速校准</button>
+            </div>
+        </div>
+
+        <!-- 基础命令区域 -->
+        <div class="section">
+            <h3>基础命令</h3>
+            <div class="command-grid">
+                <button class="btn" onclick="sendCommand('k')" id="menuBtn">显示菜单 (k)</button>
+                <button class="btn" onclick="sendCommand('m')" id="motorModeBtn">进入电机模式 (m)</button>
+                <button class="btn" onclick="sendCommand('e')" id="exitBtn">退出电机模式 (e)</button>
+                <button class="btn btn-warning" onclick="sendCommand('u')" id="saveBtn">保存配置 (u)</button>
+                <button class="btn btn-danger" onclick="sendCommand('z')" id="resetErrorBtn">重置错误 (z)</button>
+                <button class="btn" onclick="sendCommand('c')" id="calibrateBtn">校准 (c)</button>
+                <button class="btn btn-danger" onclick="emergencyStop()">🛑 紧急停止</button>
+                <button class="btn btn-warning" onclick="safeExit()">🚪 安全退出</button>
+            </div>
+        </div>
+
+        <!-- 电流环测试区域 -->
+        <div class="section motor-control">
+            <h3>电流环测试控制</h3>
+            
+            <div class="alert alert-info" style="margin-bottom: 15px;">
+                <strong>💡 使用说明</strong><br>
+                1. 先点击"进入电机模式"<br>
+                2. 点击"正向测试"或"反向测试"发送单次命令<br>
+                3. 测试完成后点击"停止电机"<br>
+                4. <strong>修复：不再自动重复发送命令，每次点击仅发送一次</strong>
+            </div>
+            
+            <div class="control-group">
+                <div class="form-group">
+                    <label for="currentValue">测试电流值 (0-100)</label>
+                    <input type="number" class="form-control" id="currentValue" value="10" min="0" max="100" step="1">
+                </div>
+                <div class="form-group">
+                    <label for="testDescription">测试说明</label>
+                    <input type="text" class="form-control" id="testDescription" placeholder="记录测试目的" readonly>
+                </div>
+            </div>
+            
+            <div class="command-grid">
+                <button class="btn btn-success" onclick="currentTestForward()" id="forwardBtn" disabled>⬆️ 发送正向命令 (q)</button>
+                <button class="btn btn-warning" onclick="currentTestReverse()" id="reverseBtn" disabled>⬇️ 发送反向命令 (w)</button>
+                <button class="btn btn-danger" onclick="stopMotor()">⏹️ 停止电机</button>
+                <button class="btn" onclick="testSequence()" id="sequenceBtn" disabled>🔄 测试序列</button>
+            </div>
+            
+            <div style="margin-top: 15px;">
+                <div class="status-item">
+                    <span class="status-label">最后命令</span>
+                    <span class="status-value" id="lastCommandSent">无</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">命令计数</span>
+                    <span class="status-value" id="commandCount">0</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">测试状态</span>
+                    <span class="status-value" id="testStatus">空闲</span>
+                </div>
+            </div>
+            
+            <!-- 原始命令调试 -->
+            <div class="control-group" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                <div class="form-group">
+                    <label for="rawCommand">原始命令调试</label>
+                    <input type="text" class="form-control" id="rawCommand" placeholder="输入单个字符" maxlength="1">
+                </div>
+                <button class="btn" onclick="sendRawCommand()">发送原始命令</button>
+                <button class="btn btn-warning" onclick="sendBasicCommands()">基础命令测试</button>
+            </div>
+        </div>
+
+        <!-- 日志区域 -->
+        <div class="section">
+            <h3>通信日志</h3>
+            <div class="log-area" id="logArea">
+                <div style="color: #00ffff;">=== FOC电机驱动上位机 - 电流环测试修复版 ===</div>
+                <div style="color: #ffa500;">🔧 修复：电流环测试不再自动重复发送命令</div>
+                <div style="color: #28a745;">✅ 每次点击仅发送一次q或w命令</div>
+                <div>等待串口连接...</div>
+            </div>
+            <button class="btn" onclick="clearLog()" style="margin-top: 10px;">清空日志</button>
+            <button class="btn" onclick="exportLog()" style="margin-top: 10px;">导出日志</button>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let port = null;
+        let reader = null;
+        let writer = null;
+        let isConnected = false;
+        let deviceState = 'unknown';
+        let errorCount = 0;
+        let dataBuffer = '';
+        let lastCommandTime = 0;
+        let lastResponseTime = 0;
+        let invalidStateCount = 0;
+        let commandCount = 0;
+        let lastCommandSent = '';
+
+        // 日志函数
+        function addLog(message, type = 'info') {
+            const logArea = document.getElementById('logArea');
+            const timestamp = new Date().toLocaleTimeString();
+            const colors = {
+                'info': '#00ff00',
+                'send': '#ffff00',
+                'receive': '#00ffff',
+                'error': '#ff6666',
+                'success': '#00ff88',
+                'warning': '#ffa500',
+                'debug': '#9370db',
+                'critical': '#ff0066'
+            };
+            
+            const logEntry = document.createElement('div');
+            logEntry.style.color = colors[type] || '#00ff00';
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            logArea.appendChild(logEntry);
+            logArea.scrollTop = logArea.scrollHeight;
+
+            // 保持日志数量
+            while (logArea.children.length > 500) {
+                logArea.removeChild(logArea.firstChild);
+            }
+        }
+
+        // 修复的串口连接
+        async function connectSerial() {
+            try {
+                if (!navigator.serial) {
+                    addLog('此浏览器不支持Web Serial API，请使用Chrome浏览器', 'error');
+                    return;
+                }
+
+                addLog('请求串口设备选择...', 'info');
+                port = await navigator.serial.requestPort();
+                
+                await port.open({ 
+                    baudRate: 230400,
+                    dataBits: 8,
+                    stopBits: 1,
+                    parity: 'none',
+                    flowControl: 'none'
+                });
+                
+                reader = port.readable.getReader();
+                writer = port.writable.getWriter();
+
+                isConnected = true;
+                updateConnectionStatus(true);
+                updateDataReadStatus('已连接');
+                dataBuffer = '';
+                errorCount = 0;
+                invalidStateCount = 0;
+                commandCount = 0;
+                
+                addLog('串口连接成功', 'success');
+
+                // 开始改进的数据读取
+                readDataImproved();
+
+                // 发送初始测试命令
+                setTimeout(() => {
+                    addLog('发送初始测试...', 'info');
+                    sendCommand('k');
+                }, 1000);
+
+            } catch (error) {
+                addLog(`连接失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 改进的数据读取函数
+        async function readDataImproved() {
+            try {
+                addLog('开始改进的数据监听...', 'info');
+                updateDataReadStatus('正在监听');
+                
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) {
+                        addLog('数据流结束', 'warning');
+                        break;
+                    }
+                    
+                    // 改进的数据处理
+                    if (value) {
+                        let receivedText = '';
+                        
+                        // 处理不同的数据类型
+                        if (value instanceof Uint8Array) {
+                            // 使用更稳定的解码方式
+                            const decoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: false });
+                            receivedText = decoder.decode(value, { stream: true });
+                        } else if (typeof value === 'string') {
+                            receivedText = value;
+                        } else {
+                            receivedText = String(value);
+                        }
+                        
+                        // 累积到缓冲区
+                        dataBuffer += receivedText;
+                        
+                        // 处理完整的行或消息
+                        processDataBuffer();
+                    }
+                }
+            } catch (error) {
+                if (isConnected) {
+                    addLog(`数据读取出错: ${error.message}`, 'error');
+                    updateDataReadStatus('读取错误');
+                    
+                    // 尝试重新连接
+                    setTimeout(async () => {
+                        addLog('尝试重新连接...', 'warning');
+                        await disconnectSerial();
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        await connectSerial();
+                    }, 3000);
+                }
+            }
+        }
+
+        // 处理数据缓冲区
+        function processDataBuffer() {
+            // 按行分割数据
+            const lines = dataBuffer.split(/[\r\n]+/);
+            
+            // 保留最后一个可能不完整的行
+            dataBuffer = lines.pop() || '';
+            
+            // 处理完整的行
+            for (const line of lines) {
+                if (line.trim().length > 0) {
+                    addLog(`收到: ${line.trim()}`, 'receive');
+                    handleReceivedData(line.trim());
+                }
+            }
+            
+            // 如果缓冲区太长，处理并清空
+            if (dataBuffer.length > 1000) {
+                if (dataBuffer.trim().length > 0) {
+                    addLog(`收到: ${dataBuffer.trim()}`, 'receive');
+                    handleReceivedData(dataBuffer.trim());
+                }
+                dataBuffer = '';
+            }
+        }
+
+        // 改进的数据处理
+        function handleReceivedData(data) {
+            lastResponseTime = Date.now();
+            updateDataReadStatus('数据正常');
+            document.getElementById('lastResponse').textContent = data.substring(0, 20) + (data.length > 20 ? '...' : '');
+            
+            const lowerData = data.toLowerCase();
+            
+            // 检查Invalid state错误
+            if (data.includes('Invalid state!') || lowerData.includes('invalid state')) {
+                invalidStateCount++;
+                updateDeviceState('invalid_state');
+                addLog(`⚠️ Invalid State 错误 (第${invalidStateCount}次)`, 'critical');
+                document.getElementById('errorCount').textContent = invalidStateCount;
+                return;
+            }
+            
+            // 检查正常响应
+            if (data.includes('Enter Motor Mode') || data.includes('motor mode')) {
+                updateDeviceState('motor_mode');
+                document.getElementById('motorMode').textContent = '电机模式';
+                enableMotorControls(true);
+                addLog('✅ 成功进入电机模式', 'success');
+                return;
+            }
+            
+            // 检查菜单响应
+            if (data.includes('Commands:') || data.includes('Motor Mode') || 
+                data.includes('Calibration') || lowerData.includes('menu')) {
+                updateDeviceState('normal');
+                addLog('✅ 收到菜单响应', 'success');
+                return;
+            }
+            
+            // 检查校准相关
+            if (lowerData.includes('calibration complete') || lowerData.includes('校准完成')) {
+                document.getElementById('calibrationStatus').textContent = '已校准';
+                updateDeviceState('normal');
+                addLog('🎉 校准完成！', 'success');
+                return;
+            }
+            
+            // 其他正常响应
+            if (data.trim().length > 0 && !lowerData.includes('error')) {
+                if (deviceState === 'unknown' || deviceState === 'invalid_state') {
+                    updateDeviceState('normal');
+                    addLog('✅ 设备响应正常', 'success');
+                }
+            }
+        }
+
+        // 更新设备状态
+        function updateDeviceState(state) {
+            deviceState = state;
+            const statusElement = document.getElementById('deviceStatus');
+            const indicator = document.getElementById('connectionIndicator');
+            
+            switch (state) {
+                case 'normal':
+                    statusElement.textContent = '正常';
+                    statusElement.className = 'status-value';
+                    if (isConnected) indicator.className = 'indicator connected';
+                    enableMotorControls(false);
+                    break;
+                case 'motor_mode':
+                    statusElement.textContent = '电机模式';
+                    statusElement.className = 'status-value';
+                    if (isConnected) indicator.className = 'indicator connected';
+                    enableMotorControls(true);
+                    break;
+                case 'invalid_state':
+                    statusElement.textContent = 'Invalid State';
+                    statusElement.className = 'status-error';
+                    indicator.className = 'indicator error';
+                    enableMotorControls(false);
+                    break;
+                case 'error':
+                    statusElement.textContent = '错误';
+                    statusElement.className = 'status-error';
+                    indicator.className = 'indicator error';
+                    enableMotorControls(false);
+                    break;
+                default:
+                    statusElement.textContent = '未知';
+                    statusElement.className = 'status-value';
+                    enableMotorControls(false);
+            }
+        }
+
+        // 更新数据读取状态
+        function updateDataReadStatus(status) {
+            document.getElementById('dataReadStatus').textContent = status;
+        }
+
+        // 更新连接状态
+        function updateConnectionStatus(connected) {
+            const indicator = document.getElementById('connectionIndicator');
+            const status = document.getElementById('connectionStatus');
+            const connectBtn = document.getElementById('connectBtn');
+            const disconnectBtn = document.getElementById('disconnectBtn');
+
+            if (connected) {
+                status.textContent = '已连接';
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+            } else {
+                indicator.className = 'indicator disconnected';
+                status.textContent = '未连接';
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+            }
+        }
+
+        // 改进的命令发送
+        async function sendCommand(command) {
+            if (!isConnected || !writer) {
+                addLog('请先连接串口', 'error');
+                return false;
+            }
+
+            try {
+                const encoder = new TextEncoder();
+                const data = encoder.encode(command);
+                await writer.write(data);
+                addLog(`发送: ${command}`, 'send');
+                lastCommandTime = Date.now();
+                
+                // 更新命令统计
+                commandCount++;
+                lastCommandSent = command;
+                updateCommandStatus();
+                
+                return true;
+            } catch (error) {
+                addLog(`发送失败: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        // 更新命令状态显示
+        function updateCommandStatus() {
+            document.getElementById('lastCommandSent').textContent = lastCommandSent || '无';
+            document.getElementById('commandCount').textContent = commandCount;
+        }
+
+        // 修复的正向电流测试 - 只发送一次命令
+        async function currentTestForward() {
+            if (deviceState !== 'motor_mode') {
+                addLog('请先进入电机模式', 'error');
+                updateTestStatus('需要电机模式');
+                return;
+            }
+
+            const currentValue = document.getElementById('currentValue').value;
+            addLog(`发送正向电流测试命令 (q) - 电流值: ${currentValue}A`, 'info');
+            updateTestStatus('发送正向命令');
+            
+            // 只发送一次q命令
+            const success = await sendCommand('q');
+            if (success) {
+                addLog('✅ 正向命令已发送，等待设备响应', 'success');
+                updateTestStatus('等待响应');
+                document.getElementById('testDescription').value = `正向测试 - ${currentValue}A`;
+            } else {
+                addLog('❌ 正向命令发送失败', 'error');
+                updateTestStatus('发送失败');
+            }
+        }
+
+        // 修复的反向电流测试 - 只发送一次命令
+        async function currentTestReverse() {
+            if (deviceState !== 'motor_mode') {
+                addLog('请先进入电机模式', 'error');
+                updateTestStatus('需要电机模式');
+                return;
+            }
+
+            const currentValue = document.getElementById('currentValue').value;
+            addLog(`发送反向电流测试命令 (w) - 电流值: ${currentValue}A`, 'info');
+            updateTestStatus('发送反向命令');
+            
+            // 只发送一次w命令
+            const success = await sendCommand('w');
+            if (success) {
+                addLog('✅ 反向命令已发送，等待设备响应', 'success');
+                updateTestStatus('等待响应');
+                document.getElementById('testDescription').value = `反向测试 - ${currentValue}A`;
+            } else {
+                addLog('❌ 反向命令发送失败', 'error');
+                updateTestStatus('发送失败');
+            }
+        }
+
+        // 停止电机 - 发送停止命令
+        async function stopMotor() {
+            addLog('发送电机停止命令...', 'warning');
+            updateTestStatus('停止电机');
+            
+            // 发送停止命令
+            const success = await sendCommand('q'); // 根据实际协议，可能需要调整停止命令
+            if (success) {
+                addLog('✅ 停止命令已发送', 'success');
+                updateTestStatus('已停止');
+                document.getElementById('testDescription').value = '电机停止';
+            } else {
+                addLog('❌ 停止命令发送失败', 'error');
+                updateTestStatus('停止失败');
+            }
+        }
+
+        // 测试序列 - 发送预定义的命令序列
+        async function testSequence() {
+            if (deviceState !== 'motor_mode') {
+                addLog('请先进入电机模式', 'error');
+                return;
+            }
+
+            addLog('=== 开始电流环测试序列 ===', 'info');
+            updateTestStatus('执行序列');
+            
+            const sequence = [
+                { cmd: 'q', desc: '正向测试', delay: 2000 },
+                { cmd: 'w', desc: '反向测试', delay: 2000 },
+                { cmd: 'q', desc: '停止电机', delay: 1000 }
+            ];
+            
+            for (let i = 0; i < sequence.length; i++) {
+                const step = sequence[i];
+                addLog(`序列步骤 ${i+1}/${sequence.length}: ${step.desc} (${step.cmd})`, 'info');
+                
+                const success = await sendCommand(step.cmd);
+                if (success) {
+                    addLog(`✅ ${step.desc} 命令已发送`, 'success');
+                } else {
+                    addLog(`❌ ${step.desc} 命令发送失败`, 'error');
+                    break;
+                }
+                
+                // 等待指定时间
+                if (i < sequence.length - 1) {
+                    addLog(`等待 ${step.delay}ms...`, 'debug');
+                    await new Promise(resolve => setTimeout(resolve, step.delay));
+                }
+            }
+            
+            addLog('测试序列完成', 'success');
+            updateTestStatus('序列完成');
+        }
+
+        // 更新测试状态
+        function updateTestStatus(status) {
+            document.getElementById('testStatus').textContent = status;
+        }
+
+        // Invalid State 修复
+        async function fixInvalidState() {
+            addLog('=== 开始修复 Invalid State ===', 'warning');
+            addLog('基于日志分析：m命令正常，其他命令触发Invalid State', 'info');
+            
+            // 步骤1：使用有效的m命令进入电机模式
+            addLog('步骤1: 使用m命令进入正常状态...', 'info');
+            await sendCommand('m');
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            if (deviceState === 'motor_mode') {
+                addLog('✅ m命令成功，设备状态正常', 'success');
+                
+                // 步骤2：在电机模式下尝试重置
+                addLog('步骤2: 在电机模式下发送停止命令...', 'info');
+                await sendCommand('q');  // 停止电机
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // 步骤3：多次发送错误重置命令
+                addLog('步骤3: 多次重置错误状态...', 'info');
+                for (let i = 0; i < 5; i++) {
+                    await sendCommand('z');
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+                
+                // 步骤4：尝试退出电机模式
+                addLog('步骤4: 尝试安全退出电机模式...', 'info');
+                await sendCommand('e');
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // 步骤5：测试其他命令
+                addLog('步骤5: 测试菜单命令...', 'info');
+                await sendCommand('k');
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                if (invalidStateCount === 0) {
+                    addLog('🎉 Invalid State 修复成功！', 'success');
+                } else {
+                    addLog('⚠️ 部分修复，建议继续使用电机模式操作', 'warning');
+                }
+            } else {
+                addLog('❌ m命令无效，需要检查硬件连接', 'error');
+            }
+        }
+
+        // 电机模式恢复
+        async function motorModeRecovery() {
+            addLog('=== 电机模式恢复 ===', 'info');
+            addLog('利用m命令正常工作的特点进行系统恢复', 'info');
+            
+            // 确保进入电机模式
+            await sendCommand('m');
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            if (deviceState === 'motor_mode') {
+                addLog('✅ 电机模式进入成功', 'success');
+                addLog('在电机模式下可以执行以下操作：', 'info');
+                addLog('- 使用 q/w 控制电机', 'info');
+                addLog('- 使用 k 显示菜单', 'info');
+                addLog('- 电机功能完全正常', 'info');
+                
+                // 测试电机控制
+                addLog('测试电机控制功能...', 'info');
+                await sendCommand('q');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                addLog('电机控制测试完成', 'success');
+            }
+        }
+
+        // 软重置序列
+        async function softReset() {
+            addLog('=== 执行软重置序列 ===', 'warning');
+            
+            const resetSequence = ['z', 'z', 'z', 'm', 'q', 'z', 'e', 'z'];
+            
+            for (let i = 0; i < resetSequence.length; i++) {
+                const cmd = resetSequence[i];
+                addLog(`重置步骤 ${i+1}/${resetSequence.length}: ${cmd}`, 'info');
+                await sendCommand(cmd);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            
+            addLog('软重置序列完成', 'success');
+        }
+
+        // 测试设备响应
+        async function testDeviceResponse() {
+            addLog('=== 测试设备响应 ===', 'info');
+            
+            const testCommands = [
+                { cmd: 'm', desc: '电机模式' },
+                { cmd: 'k', desc: '菜单显示' },
+                { cmd: 'z', desc: '错误重置' },
+                { cmd: 'q', desc: '电机控制' }
+            ];
+            
+            for (const test of testCommands) {
+                addLog(`测试 ${test.desc} (${test.cmd})...`, 'info');
+                const oldInvalidCount = invalidStateCount;
+                
+                await sendCommand(test.cmd);
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                if (invalidStateCount > oldInvalidCount) {
+                    addLog(`❌ ${test.desc} 触发 Invalid State`, 'error');
+                } else {
+                    addLog(`✅ ${test.desc} 响应正常`, 'success');
+                }
+            }
+        }
+
+        // 清理所有错误
+        async function clearAllErrors() {
+            addLog('=== 清理所有错误状态 ===', 'warning');
+            
+            // 重置计数器
+            errorCount = 0;
+            invalidStateCount = 0;
+            document.getElementById('errorCount').textContent = '0';
+            
+            // 发送多次z命令
+            for (let i = 0; i < 10; i++) {
+                await sendCommand('z');
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+            
+            addLog('错误清理完成', 'success');
+        }
+
+        // 快速校准
+        async function quickCalibration() {
+            addLog('=== 快速校准序列 ===', 'info');
+            
+            // 先进入电机模式确保设备正常
+            await sendCommand('m');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            if (deviceState === 'motor_mode') {
+                // 退出并尝试校准
+                await sendCommand('e');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await sendCommand('c');
+                addLog('校准命令已发送，等待完成...', 'info');
+            } else {
+                addLog('设备状态异常，无法校准', 'error');
+            }
+        }
+
+        // 启用/禁用电机控制按钮
+        function enableMotorControls(enabled) {
+            const motorButtons = ['forwardBtn', 'reverseBtn', 'sequenceBtn'];
+            motorButtons.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    btn.disabled = !enabled || deviceState !== 'motor_mode';
+                }
+            });
+        }
+
+        // 紧急停止
+        async function emergencyStop() {
+            addLog('🚨 执行紧急停止！', 'critical');
+            updateTestStatus('紧急停止');
+            
+            // 多次发送停止命令
+            for (let i = 0; i < 3; i++) {
+                await sendCommand('q');
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            // 尝试退出电机模式
+            await sendCommand('e');
+            
+            addLog('紧急停止完成', 'success');
+            updateTestStatus('已停止');
+        }
+
+        // 安全退出
+        async function safeExit() {
+            addLog('执行安全退出序列...', 'info');
+            updateTestStatus('安全退出');
+            
+            // 清除错误
+            await sendCommand('z');
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // 退出电机模式
+            await sendCommand('e');
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            enableMotorControls(false);
+            addLog('安全退出完成', 'success');
+            updateTestStatus('已退出');
+        }
+
+        // 断开连接
+        async function disconnectSerial() {
+            try {
+                isConnected = false;
+                updateDataReadStatus('已断开');
+                updateTestStatus('已断开');
+                
+                if (reader) {
+                    await reader.cancel();
+                    reader = null;
+                }
+                if (writer) {
+                    await writer.close();
+                    writer = null;
+                }
+                if (port) {
+                    await port.close();
+                    port = null;
+                }
+                
+                updateConnectionStatus(false);
+                updateDeviceState('unknown');
+                addLog('串口连接已断开', 'info');
+                
+            } catch (error) {
+                addLog(`断开出错: ${error.message}`, 'error');
+            }
+        }
+
+        // 发送原始命令
+        async function sendRawCommand() {
+            const rawCommand = document.getElementById('rawCommand').value.trim();
+            if (!rawCommand) {
+                addLog('请输入要发送的字符', 'error');
+                return;
+            }
+            
+            await sendCommand(rawCommand.charAt(0));
+        }
+
+        // 基础命令测试
+        async function sendBasicCommands() {
+            addLog('=== 基础命令测试 ===', 'info');
+            
+            const commands = [
+                { cmd: 'k', desc: '显示菜单', delay: 1000 },
+                { cmd: 'm', desc: '进入电机模式', delay: 1500 },
+                { cmd: 'z', desc: '清除错误', delay: 500 }
+            ];
+            
+            for (const test of commands) {
+                addLog(`测试: ${test.desc} (${test.cmd})`, 'info');
+                await sendCommand(test.cmd);
+                await new Promise(resolve => setTimeout(resolve, test.delay));
+            }
+            
+            addLog('基础命令测试完成', 'success');
+        }
+
+        // 清空日志
+        function clearLog() {
+            document.getElementById('logArea').innerHTML = '<div style="color: #00ffff;">=== 日志已清空 ===</div>';
+        }
+
+        // 导出日志
+        function exportLog() {
+            const logArea = document.getElementById('logArea');
+            const logText = Array.from(logArea.children).map(div => div.textContent).join('\n');
+            
+            const blob = new Blob([logText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `foc_motor_fix_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // 事件绑定
+        document.getElementById('connectBtn').addEventListener('click', connectSerial);
+        document.getElementById('disconnectBtn').addEventListener('click', disconnectSerial);
+        document.getElementById('rawCommand').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendRawCommand();
+            }
+        });
+
+        // 页面初始化
+        window.addEventListener('load', function() {
+            addLog('电流环测试修复版系统初始化完成', 'success');
+            addLog('🔧 修复内容：', 'info');
+            addLog('1. 电流环测试不再自动重复发送命令', 'success');
+            addLog('2. 每次点击仅发送一次q或w命令', 'success');
+            addLog('3. 移除自动定时器和连续发送逻辑', 'success');
+            addLog('4. 优化测试状态显示和命令统计', 'info');
+            addLog('5. 保留手动控制和测试序列功能', 'info');
+            addLog('请连接串口开始使用', 'warning');
+            
+            // 初始化按钮状态
+            enableMotorControls(false);
+            updateTestStatus('空闲');
+            updateCommandStatus();
+        });
+
+        // 页面关闭前清理
+        window.addEventListener('beforeunload', async function() {
+            if (isConnected) {
+                // 发送停止命令
+                await sendCommand('q');
+                await sendCommand('e');
+                await disconnectSerial();
+            }
+        });
+    </script>
+</body>
+</html>

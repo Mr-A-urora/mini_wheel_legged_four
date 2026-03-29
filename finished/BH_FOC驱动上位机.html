@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>电机驱动控制平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        :root {
+            --primary: #3498db;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --card-bg: rgba(255, 255, 255, .08);
+            --text: #e6e6e6;
+            --warning: #f39c12;
+            --purple: #9b59b6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .logo i {
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #a0aec0;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 2fr 3fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        @media(max-width:900px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, .3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, .1);
+            transition: transform .3s, box-shadow .3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, .4);
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, .1);
+        }
+
+        .card-title i {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, .2);
+        }
+
+        .status-indicator {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #e74c3c;
+        }
+
+        .status-indicator.connected {
+            background: #2ecc71;
+            box-shadow: 0 0 10px #2ecc71;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all .3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: #fff;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+
+        .btn-purple {
+            background: var(--purple);
+            color: #fff;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, .3);
+        }
+
+        select,
+        input {
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, .1);
+            background: rgba(0, 0, 0, .3);
+            color: var(--text);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #cbd5e0;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #a0aec0;
+            font-size: .9rem;
+            border-top: 1px solid rgba(255, 255, 255, .1);
+        }
+
+        /* 可移动设置面板 */
+        .settings-panel {
+            position: fixed;
+            top: 20%;
+            left: 30%;
+            width: 350px;
+            background: rgba(30, 30, 60, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(52, 152, 219, 0.5);
+            z-index: 9999;
+            display: none;
+            cursor: move;
+            user-select: none;
+        }
+
+        .settings-panel.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .settings-panel h3 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #4facfe;
+            cursor: default;
+        }
+
+        .settings-panel h3 i {
+            color: var(--warning);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .settings-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .settings-row label {
+            flex: 0 0 100%;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .settings-row input,
+        .settings-row select {
+            flex: 1;
+            min-width: 120px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px;
+        }
+
+        .settings-row .btn {
+            flex: 0 0 auto;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+        }
+
+        .settings-confirm {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 15px;
+        }
+
+        .settings-confirm .btn {
+            padding: 10px 20px;
+            font-size: 1rem;
+        }
+
+        .serial-history {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            color: var(--text);
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            height: 100px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .serial-history p {
+            margin: 5px 0;
+            padding: 3px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .serial-history .sent {
+            color: #4facfe;
+        }
+
+        .serial-history .received {
+            color: #2ecc71;
+        }
+
+        .serial-history .system {
+            color: #f39c12;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-cogs"></i>
+                <h1>八荒电机驱动控制平台</h1>
+            </div>
+            <p class="subtitle">通过串口通信实现对电机的精确控制与实时监控</p>
+        </header>
+
+        <div class="dashboard">
+            <!-- 控制面板 -->
+            <div class="card">
+                <div class="card-title"><i class="fas fa-plug"></i>
+                    <h2>串口连接</h2>
+                </div>
+                <div class="connection-status">
+                    <div class="status-indicator" id="statusIndicator"></div>
+                    <span id="statusText">未连接</span>
+                </div>
+                <div class="control-group">
+                    <div class="control-row">
+                        <div style="flex:1;">
+                            <label for="portSelect">选择串口设备</label>
+                            <select id="portSelect">
+                                <option value="">--点击下方蓝色按钮连接设备 --</option>
+                            </select>
+                        </div>
+                        <div style="flex:1;">
+                            <label for="baudSelect">波特率</label>
+                            <select id="baudSelect">
+                                <option>9600</option>
+                                <option>14400</option>
+                                <option>19200</option>
+                                <option>38400</option>
+                                <option>57600</option>
+                                <option>115200</option>
+                                <option selected>230400</option>
+                                <option>460800</option>
+                                <option>500000</option>
+                                <option>576000</option>
+                                <option>921600</option>
+                                <option>1000000</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" id="connectBtn"><i class="fas fa-link"></i> 连接设备</button>
+                        <button class="btn btn-danger" id="disconnectBtn" disabled><i class="fas fa-unlink"></i>
+                            断开连接</button>
+                        <button class="btn btn-outline" id="refreshBtn"><i class="fas fa-sync"></i> 刷新设备</button>
+                    </div>
+                </div>
+
+                <div class="card-title"><i class="fas fa-sliders-h"></i>
+                    <h2>电机控制</h2>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="calibrateBtn"><i class="fas fa-crosshairs"></i> 校准</button>
+                    <button class="btn btn-warning" id="settingsBtn"><i class="fas fa-cog"></i> 设置</button>
+                    <button class="btn btn-outline" id="menuBtn"><i class="fas fa-bars"></i> 菜单</button>
+                    <button class="btn btn-success" id="saveBtn"><i class="fas fa-save"></i> 保存</button>
+                </div>
+                <small style="color:#f39c12;display:block;margin-top:8px;margin-bottom:10px;">
+                    <i class="fas fa-info-circle"></i> 请在点击“保存”前，先返回菜单，否则命令会失效。
+                </small>
+                <div class="btn-group" style="margin-top:15px;">
+                    <button class="btn btn-success" id="startBtn"><i class="fas fa-play"></i> 启动电机</button>
+                    <button class="btn btn-danger" id="stopBtn"><i class="fas fa-stop"></i> 停止电机</button>
+                </div>
+                <div class="btn-group" style="margin-top:15px;">
+                    <button class="btn btn-outline" id="cwBtn"><i class="fas fa-redo"></i> 正转</button>
+                    <button class="btn btn-outline" id="ccwBtn"><i class="fas fa-undo"></i> 反转</button>
+                    <button class="btn btn-purple" id="brakeBtn"><i class="fas fa-hand-paper"></i> canid自动设置</button>
+                </div>
+            </div>
+
+            <!-- 串口监控面板 -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-terminal"></i>
+                    <h2>串口通信监控</h2>
+                    <div style="flex:1;"></div>
+                    <button class="btn btn-outline" id="clearLogBtn"><i class="fas fa-trash"></i> 清空日志</button>
+                </div>
+
+                <!-- 接收区 -->
+                <label style="color:#cbd5e0;font-size:.9em;">接收数据</label>
+                <textarea id="serialRx" readonly
+                    style="width:100%;height:200px;background:rgba(0,0,0,.25);
+                             border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px;
+                             color:var(--text);font-family:'Courier New',monospace;font-size:14px;resize:vertical;"></textarea>
+
+                <!-- 发送历史 -->
+                <label style="color:#cbd5e0;font-size:.9em;margin-top:15px;">发送历史</label>
+                <div class="serial-history" id="serialHistory">
+                    <!-- 发送记录将在这里显示 -->
+                </div>
+
+                <!-- 发送区 -->
+                <label style="color:#cbd5e0;font-size:.9em;margin-top:10px;">发送命令（回车发送）</label>
+                <input type="text" id="commandInput" style="width:100%;padding:12px;border-radius:8px;background:rgba(0,0,0,.25);
+                          border:1px solid rgba(255,255,255,.1);color:var(--text);" placeholder="输入要发送的内容，回车即可发送">
+            </div>
+        </div>
+
+        <!-- 可移动设置面板 -->
+        <div class="settings-panel" id="settingsPanel">
+            <h3><i class="fas fa-cog"></i> 电机参数设置</h3>
+
+            <div class="settings-row">
+                <label for="currentSetting">最大电流 (A)</label>
+                <input type="number" id="currentSetting" value="2.5" min="0.1" max="10" step="0.1">
+                <button class="btn btn-outline" id="sendCurrentBtn">发送</button>
+            </div>
+
+            <div class="settings-row">
+                <label for="speedSetting">最大速度 (RPM)</label>
+                <input type="number" id="speedSetting" value="1500" min="100" max="5000" step="10">
+                <button class="btn btn-outline" id="sendSpeedBtn">发送</button>
+            </div>
+
+            <div class="settings-row">
+                <label for="accelSetting">加速度 (RPM/s)</label>
+                <input type="number" id="accelSetting" value="500" min="10" max="2000" step="10">
+                <button class="btn btn-outline" id="sendAccelBtn">发送</button>
+            </div>
+
+            <div class="settings-row">
+                <label for="decelSetting">减速度 (RPM/s)</label>
+                <input type="number" id="decelSetting" value="500" min="10" max="2000" step="10">
+                <button class="btn btn-outline" id="sendDecelBtn">发送</button>
+            </div>
+
+            <div class="settings-row">
+                <label for="CanidSetting">CAN_ID</label>
+                <input type="number" id="CanidSetting" value="1" min="1" max="255" step="1">
+                <button class="btn btn-outline" id="sendCanidBtn">发送</button>
+            </div>
+
+            <div class="settings-confirm">
+                <button class="btn btn-success" id="confirmSettingsBtn"><i class="fas fa-check-circle"></i> 确认</button>
+                <button class="btn btn-outline" id="closeSettingsBtn"><i class="fas fa-times"></i> 关闭</button>
+            </div>
+        </div>
+
+        <footer>
+            <p>电机驱动控制平台 v1.1 | 基于 Web Serial API 开发 | 安全、高效、直观</p>
+        </footer>
+    </div>
+
+    <script>
+        // ---------- 全局变量 ----------
+        let serialPort = null, reader = null, writer = null, isConnected = false, autoScrollEnabled = true, hexMode = false;
+
+        // ---------- DOM ----------
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const portSelect = document.getElementById('portSelect');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const statusText = document.getElementById('statusText');
+
+        const serialRx = document.getElementById('serialRx');
+        const commandInput = document.getElementById('commandInput');
+        const serialHistory = document.getElementById('serialHistory');
+        const clearLogBtn = document.getElementById('clearLogBtn');
+
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const cwBtn = document.getElementById('cwBtn');
+        const ccwBtn = document.getElementById('ccwBtn');
+        const brakeBtn = document.getElementById('brakeBtn');
+        const calibrateBtn = document.getElementById('calibrateBtn');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const menuBtn = document.getElementById('menuBtn');
+
+        // 设置面板元素
+        const settingsPanel = document.getElementById('settingsPanel');
+        const sendCurrentBtn = document.getElementById('sendCurrentBtn');
+        const sendSpeedBtn = document.getElementById('sendSpeedBtn');
+        const sendAccelBtn = document.getElementById('sendAccelBtn');
+        const sendDecelBtn = document.getElementById('sendDecelBtn');
+        const sendCanidBtn = document.getElementById('sendCanidBtn');
+        const confirmSettingsBtn = document.getElementById('confirmSettingsBtn');
+        const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+
+        // ---------- 工具 ----------
+        function addToRx(message, type = 'receive') {
+            const now = new Date();
+
+            serialRx.value += `${message}`;
+            if (autoScrollEnabled) serialRx.scrollTop = serialRx.scrollHeight;
+        }
+
+        function addToHistory(message, type = 'sent') {
+            const now = new Date();
+            const ts = `[${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}]`;
+
+            const p = document.createElement('p');
+            p.className = type;
+            p.innerHTML = `<i class="fas fa-${type === 'sent' ? 'arrow-right' : 'arrow-left'}"></i> ${ts} ${message}`;
+
+            serialHistory.appendChild(p);
+            serialHistory.scrollTop = serialHistory.scrollHeight;
+        }
+
+        function updateConnectionStatus(connected) {
+            isConnected = connected;
+            statusIndicator.className = 'status-indicator' + (connected ? ' connected' : '');
+            statusText.textContent = connected ? '已连接' : '未连接';
+            connectBtn.disabled = connected;
+            disconnectBtn.disabled = !connected;
+            portSelect.disabled = connected;
+            if (connected) {
+                addToRx('串口已连接', 'info\n');
+
+            }
+            else {
+                addToRx('串口已断开', 'info\n');
+
+            }
+        }
+
+        async function sendData(data) {
+            if (!isConnected || !writer) {
+                addToRx('未连接到串口', 'error');
+
+                return;
+            }
+
+            try {
+                const enc = new TextEncoder();
+                await writer.write(enc.encode(data));
+
+                // 添加到发送历史
+                addToHistory(data);
+                // 添加到接收区
+
+            } catch (e) {
+                addToRx(`发送错误: ${e}`, 'error');
+
+            }
+        }
+
+        // ---------- 连接/断开 ----------
+        async function connectToSerial() {
+            if (!('serial' in navigator)) {
+                addToRx('浏览器不支持 Web Serial API', 'error');
+
+                return;
+            }
+
+            try {
+                const baud = parseInt(document.getElementById('baudSelect').value);
+                serialPort = await navigator.serial.requestPort();
+                await serialPort.open({ baudRate: baud });
+                writer = serialPort.writable.getWriter();
+                reader = serialPort.readable.getReader();
+                updateConnectionStatus(true);
+                readLoop();
+            } catch (e) {
+                addToRx(`连接错误: ${e}`, 'error');
+
+            }
+        }
+
+        async function disconnectSerial() {
+            if (reader) { await reader.cancel(); reader = null; }
+            if (writer) { await writer.releaseLock(); writer = null; }
+            if (serialPort) { await serialPort.close(); serialPort = null; }
+            updateConnectionStatus(false);
+        }
+
+        let rxBuffer = '';
+
+        async function readLoop() {
+            const decoder = new TextDecoder();
+            rxBuffer = '';
+            while (isConnected && reader) {
+                try {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+                    if (value) {
+                        rxBuffer += decoder.decode(value, { stream: true });
+                        let lines = rxBuffer.split('\n');
+                        // 保留最后一个不完整的
+                        rxBuffer = lines.pop();
+                        for (const line of lines) {
+                            addToRx(line + '\n');
+                        }
+                    }
+                } catch (e) {
+                    addToRx(`读取错误: ${e}`, 'error');
+                    break;
+                }
+            }
+            // 处理剩余未结束的数据
+            if (rxBuffer) addToRx(rxBuffer);
+        }
+
+        // ---------- 刷新串口 ----------
+        async function refreshSerialPorts() {
+            if (!('serial' in navigator)) {
+                addToRx('浏览器不支持 Web Serial API', 'error');
+
+                return;
+            }
+
+
+
+            const msg = `已加载 ${ports.length} 个设备`;
+            addToRx(msg, 'info');
+
+        }
+
+        // ---------- 可移动设置面板 ----------
+        let isDragging = false;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+
+        function toggleSettingsPanel() {
+            settingsPanel.classList.toggle('active');
+
+            if (settingsPanel.classList.contains('active')) {
+                sendData('s'); // 发送字母s
+            } else {
+
+                addToHistory('设置面板已关闭', 'system');
+            }
+        }
+
+        function closeSettingsPanel() {
+            settingsPanel.classList.remove('active');
+            addToRx('设置面板已关闭', 'setting');
+
+        }
+
+        // 拖动功能
+        settingsPanel.addEventListener('mousedown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'BUTTON') {
+                return; // 不拖动输入框和按钮
+            }
+            isDragging = true;
+            dragOffsetX = e.clientX - settingsPanel.offsetLeft;
+            dragOffsetY = e.clientY - settingsPanel.offsetTop;
+            settingsPanel.style.cursor = 'grabbing';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            settingsPanel.style.left = `${e.clientX - dragOffsetX}px`;
+            settingsPanel.style.top = `${e.clientY - dragOffsetY}px`;
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            settingsPanel.style.cursor = 'move';
+        });
+
+        // ---------- 设置面板相关函数 ----------
+        function sendSetting(type) {
+            let value, command;
+
+            switch (type) {
+
+                case 'canid':
+                    value = document.getElementById('CanidSetting').value;
+                    command = `can_id = ${value}`;
+                    break;
+                default:
+                    return;
+            }
+
+            sendData(command);
+
+        }
+
+        function confirmSettings() {
+            sendData('f'); // 发送确认字母
+
+            addToHistory('设置已确认', 'system');
+            closeSettingsPanel();
+        }
+
+        // ---------- 事件 ----------
+        connectBtn.addEventListener('click', connectToSerial);
+        disconnectBtn.addEventListener('click', disconnectSerial);
+        refreshBtn.addEventListener('click', refreshSerialPorts);
+        clearLogBtn.addEventListener('click', () => {
+            serialRx.value = '';
+            serialHistory.innerHTML = '';
+        });
+
+        startBtn.addEventListener('click', () => sendData('m'));
+        stopBtn.addEventListener('click', () => sendData('k'));
+        cwBtn.addEventListener('click', () => sendData('q'));
+        ccwBtn.addEventListener('click', () => sendData('w'));
+        brakeBtn.addEventListener('click', () => sendData('h'));
+        calibrateBtn.addEventListener('click', () => sendData('c'));
+        settingsBtn.addEventListener('click', toggleSettingsPanel);
+        saveBtn.addEventListener('click', () => sendData('u'));
+        menuBtn.addEventListener('click', () => sendData('k'));
+        // 设置面板事件
+        sendCurrentBtn.addEventListener('click', () => sendSetting('current'));
+        sendSpeedBtn.addEventListener('click', () => sendSetting('speed'));
+        sendAccelBtn.addEventListener('click', () => sendSetting('accel'));
+        sendDecelBtn.addEventListener('click', () => sendSetting('decel'));
+        sendCanidBtn.addEventListener('click', () => sendSetting('canid'));
+        confirmSettingsBtn.addEventListener('click', confirmSettings);
+        closeSettingsBtn.addEventListener('click', closeSettingsPanel);
+
+        // 发送框回车
+        commandInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const txt = commandInput.value.trim();
+                if (txt) {
+                    sendData(txt);
+                    commandInput.value = '';
+                }
+            }
+        });
+
+        // ---------- 初始化 ----------
+        window.addEventListener('DOMContentLoaded', refreshSerialPorts);
+
+
+    </script>
+</body>
+
+</html>

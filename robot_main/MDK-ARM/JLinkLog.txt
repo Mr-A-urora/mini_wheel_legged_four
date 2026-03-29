@@ -1,0 +1,112 @@
+T69DC 000:003.300   SEGGER J-Link V8.40 Log File
+T69DC 000:003.404   DLL Compiled: Jun  4 2025 12:06:45
+T69DC 000:003.407   Logging started @ 2025-06-15 05:02
+T69DC 000:003.410   Process: D:\Keil_v5\UV4\UV4.exe
+T69DC 000:003.418 - 3.412ms 
+T69DC 000:003.424 JLINK_SetWarnOutHandler(...)
+T69DC 000:003.427 - 0.004ms 
+T69DC 000:003.433 JLINK_OpenEx(...)
+T69DC 000:007.194   Firmware: J-Link V9 compiled May  7 2021 16:26:12
+T69DC 000:008.907   Firmware: J-Link V9 compiled May  7 2021 16:26:12
+T69DC 000:009.061   Decompressing FW timestamp took 101 us
+T69DC 000:016.488   Hardware: V9.70
+T69DC 000:016.497   S/N: 20781318
+T69DC 000:016.501   OEM: SEGGER
+T69DC 000:016.505   Feature(s): GDB, RDI, FlashBP, FlashDL, JFlash
+T69DC 000:017.615   Bootloader: (FW returned invalid version)
+T69DC 000:018.954   TELNET listener socket opened on port 19021
+T69DC 000:019.007   WEBSRV WEBSRV_Init(): Starting webserver thread(s)
+T69DC 000:019.191   WEBSRV Webserver running on local port 19080
+T69DC 000:019.246   Looking for J-Link GUI Server exe at: D:\Keil_v5\ARM\Segger\JLinkGUIServer.exe
+T69DC 000:019.309   Looking for J-Link GUI Server exe at: C:\Program Files\SEGGER\JLink_V840\JLinkGUIServer.exe
+T69DC 000:019.328   Forking J-Link GUI Server: C:\Program Files\SEGGER\JLink_V840\JLinkGUIServer.exe
+T69DC 000:198.365   J-Link GUI Server info: "J-Link GUI server V8.40 "
+T69DC 000:201.902 - 198.459ms returns "O.K."
+T69DC 000:201.923 JLINK_GetEmuCaps()
+T69DC 000:201.928 - 0.005ms returns 0xB9FF7BBF
+T69DC 000:201.943 JLINK_TIF_GetAvailable(...)
+T69DC 000:202.485 - 0.541ms 
+T69DC 000:202.497 JLINK_SetErrorOutHandler(...)
+T69DC 000:202.500 - 0.003ms 
+T69DC 000:202.525 JLINK_ExecCommand("ProjectFile = "E:\Git\miniarx3\robot_main\MDK-ARM\JLinkSettings.ini"", ...). 
+T69DC 000:212.351   Ref file found at: D:\Keil_v5\ARM\Segger\JLinkDevices.ref
+T69DC 000:212.413   REF file references invalid XML file: C:\Program Files\SEGGER\JLink_V840\JLinkDevices.xml
+T69DC 000:213.313 - 10.789ms returns 0x00
+T69DC 000:219.802 JLINK_ExecCommand("Device = STM32H723VGTx", ...). 
+T69DC 000:220.649   Flash bank @ 0x08000000: SFL: Parsing sectorization info from ELF file
+T69DC 000:220.658     FlashDevice.SectorInfo[0]: .SectorSize = 0x00020000, .SectorStartAddr = 0x00000000
+T69DC 000:220.663   FlashBank @0x08000000: Sectorization info from SFL ELF file ignored because sectorization override from DLL / XML file is active.
+T69DC 000:220.980   Flash bank @ 0x90000000: SFL: Parsing sectorization info from ELF file
+T69DC 000:220.988     FlashDevice.SectorInfo[0]: .SectorSize = 0x00010000, .SectorStartAddr = 0x00000000
+T69DC 000:229.740   Device "STM32H723VG" selected.
+T69DC 000:229.958 - 10.143ms returns 0x00
+T69DC 000:229.969 JLINK_ExecCommand("DisableConnectionTimeout", ...). 
+T69DC 000:230.009   ERROR: Unknown command
+T69DC 000:230.019 - 0.018ms returns 0x01
+T69DC 000:230.024 JLINK_GetHardwareVersion()
+T69DC 000:230.028 - 0.003ms returns 97000
+T69DC 000:230.031 JLINK_GetDLLVersion()
+T69DC 000:230.034 - 0.002ms returns 84000
+T69DC 000:230.038 JLINK_GetOEMString(...)
+T69DC 000:230.042 JLINK_GetFirmwareString(...)
+T69DC 000:230.045 - 0.003ms 
+T69DC 000:248.654 JLINK_GetDLLVersion()
+T69DC 000:248.664 - 0.010ms returns 84000
+T69DC 000:248.668 JLINK_GetCompileDateTime()
+T69DC 000:248.671 - 0.002ms 
+T69DC 000:255.577 JLINK_GetFirmwareString(...)
+T69DC 000:255.587 - 0.009ms 
+T69DC 000:262.217 JLINK_GetHardwareVersion()
+T69DC 000:262.226 - 0.009ms returns 97000
+T69DC 000:267.423 JLINK_GetSN()
+T69DC 000:267.433 - 0.010ms returns 20781318
+T69DC 000:276.294 JLINK_GetOEMString(...)
+T69DC 000:289.090 JLINK_TIF_Select(JLINKARM_TIF_JTAG)
+T69DC 000:290.957 - 1.866ms returns 0x00
+T69DC 000:290.965 JLINK_HasError()
+T69DC 000:290.975 JLINK_SetSpeed(5000)
+T69DC 000:291.394 - 0.420ms 
+T69DC 000:291.399 JLINK_GetIdData(pIdData)
+T69DC 000:296.937   ConfigTargetSettings() start
+T69DC 000:296.956    J-Link Script File: Executing ConfigTargetSettings()
+T69DC 000:305.288   ConfigTargetSettings() end - Took 25us
+T69DC 000:310.463   InitTarget() start
+T69DC 000:310.508    J-Link Script File: Executing InitTarget()
+T69DC 000:316.069   JTAG selected. Identifying JTAG Chain...
+T69DC 000:325.017   TotalIRLen = ?, IRPrint = 0x..000000000000000000000000
+T69DC 000:330.689   Error: Scanning JTAG chain failed.
+T69DC 000:339.533   Can not attach to CPU. Trying connect under reset.
+T69DC 000:547.287   
+  ***** Warning: 
+T69DC 000:547.304   RESET (pin 15) high, but should be low. Please check target hardware.
+T69DC 000:605.079   JTAG selected. Identifying JTAG Chain...
+T69DC 000:616.026   TotalIRLen = ?, IRPrint = 0x..000000000000000000000000
+T69DC 000:631.533   Error: Scanning JTAG chain failed.
+T69DC 000:647.717   Connecting to CPU via connect under reset failed.
+T69DC 000:707.733   InitTarget() end - Took 388ms
+T69DC 000:714.124   Connect failed. Resetting via Reset pin and trying again.
+T69DC 000:922.503   
+  ***** Warning: 
+T69DC 000:922.520   RESET (pin 15) high, but should be low. Please check target hardware.
+T69DC 000:992.866   ConfigTargetSettings() start
+T69DC 000:992.897    J-Link Script File: Executing ConfigTargetSettings()
+T69DC 001:000.849   ConfigTargetSettings() end - Took 10us
+T69DC 001:006.157   InitTarget() start
+T69DC 001:006.168    J-Link Script File: Executing InitTarget()
+T69DC 001:015.929   JTAG selected. Identifying JTAG Chain...
+T69DC 001:022.864   TotalIRLen = ?, IRPrint = 0x..000000000000000000000000
+T69DC 001:035.242   Error: Scanning JTAG chain failed.
+T69DC 001:040.628   Can not attach to CPU. Trying connect under reset.
+T69DC 001:253.347   
+  ***** Warning: 
+T69DC 001:253.364   RESET (pin 15) high, but should be low. Please check target hardware.
+T69DC 001:316.258   JTAG selected. Identifying JTAG Chain...
+T69DC 001:338.251   TotalIRLen = ?, IRPrint = 0x..000000000000000000000000
+T69DC 001:349.942   Error: Scanning JTAG chain failed.
+T69DC 001:365.952   Connecting to CPU via connect under reset failed.
+T69DC 001:432.672   InitTarget() end - Took 410ms
+T69DC 001:432.692 - 1141.292ms 
+T69DC 003:259.185 JLINK_Close()
+T69DC 003:273.226 - 14.040ms
+T69DC 003:273.241   
+T69DC 003:273.244   Closed

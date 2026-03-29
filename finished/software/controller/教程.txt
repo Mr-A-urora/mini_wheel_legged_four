@@ -1,0 +1,6 @@
+https://www.cnblogs.com/manastudent/p/18131948
+
+CMD：串口（115200）发set，搜索蓝牙地址，
+将搜索到的蓝牙地址发送（例如：65:0c:4e:b5:31:3d）
+
+DBUS串口波特率：100000
