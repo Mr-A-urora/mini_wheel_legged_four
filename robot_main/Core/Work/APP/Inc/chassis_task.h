@@ -10,18 +10,12 @@
 #define Wheel_Motor_Left_ID 4
 #define Wheel_Motor_Right_ID 3
 
-
-
-
-
-
 typedef struct control
 {
     float cur;
     float tar;
     float err;
-}Control_t;
-
+} Control_t;
 
 typedef struct chassis_task
 {
@@ -33,8 +27,7 @@ typedef struct chassis_task
     Control_t x_filter;
     Control_t v_filter;
 
-}_Chassis_Param;
-
+} _Chassis_Param;
 
 extern _Chassis_Param chassis;
 void Chassis_task(void);

@@ -104,7 +104,6 @@ void Xbox_rx_buf_Handle(uint8_t *rx_buffer)
 	{
 		xbox.btnXbox_falling = 1;
 	}
-	
 
 	// 更新上次状态
 	xbox.btnSelect_last = xbox.btnSelect;

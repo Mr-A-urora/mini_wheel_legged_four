@@ -1,16 +1,3 @@
-/**
- ******************************************************************************
- * @file    BMI088driver.h
- * @author
- * @version V1.1.2
- * @version V1.2.0
- * @date    2022/3/8
- * @brief
- ******************************************************************************
- * @attention
- *
- ******************************************************************************
- */
 #ifndef BMI088DRIVER_H
 #define BMI088DRIVER_H
 
@@ -44,23 +31,22 @@
 #define BMI088_GYRO_250_SEN 0.00013315805450396191230191732547673f
 #define BMI088_GYRO_125_SEN 0.000066579027251980956150958662738366f
 
-// ĞèÊÖ¶¯ĞŞ¸Ä
+// ä¼ æ„Ÿå™¨é›¶åæ ¡å‡†å€¼ï¼ˆæ‰‹åŠ¨ä¿®æ”¹ï¼‰
 #define GxOFFSET 0.00180152827f
 #define GyOFFSET 0.000545416377f
 #define GzOFFSET -0.00147822534f
 #define AxOFFSET 0.0302134994f
 #define AyOFFSET -0.180137232f
-#define AzOFFSET 0.0f//ZÖáÏÈ²»¼õÈ¥ÁãÆ®Öµ£¬ÒòÎªÁãÆ®Öµ°üº¬ÖØÁ¦¼ÓËÙ¶ÈµÄÖµ
+#define AzOFFSET 0.0f // Zè½´æš‚ä¸å»é™¤æ¼‚ç§»å€¼ï¼Œå› ä¸ºæ¼‚ç§»å€¼ä¼šå½±å“é‡åŠ›åŠ é€Ÿåº¦çš„å€¼
 #define gNORM 9.84484291f
 
-
-//#define GxOFFSET -0.002378364326f
-//#define GyOFFSET -0.004670696799f
-//#define GzOFFSET 0.000276081410f
-//#define AxOFFSET 0.17332880855f
-//#define AyOFFSET 0.123745501041f
-//#define AzOFFSET 0.0f//ZÖáÏÈ²»¼õÈ¥ÁãÆ®Öµ£¬ÒòÎªÁãÆ®Öµ°üº¬ÖØÁ¦¼ÓËÙ¶ÈµÄÖµ
-//#define gNORM 9.799211502075f
+// #define GxOFFSET -0.002378364326f
+// #define GyOFFSET -0.004670696799f
+// #define GzOFFSET 0.000276081410f
+// #define AxOFFSET 0.17332880855f
+// #define AyOFFSET 0.123745501041f
+// #define AzOFFSET 0.0f // Zè½´æš‚ä¸å»é™¤æ¼‚ç§»å€¼ï¼Œå› ä¸ºæ¼‚ç§»å€¼ä¼šå½±å“é‡åŠ›åŠ é€Ÿåº¦çš„å€¼
+// #define gNORM 9.799211502075f
 
 typedef struct
 {
@@ -73,9 +59,9 @@ typedef struct
 
     float AccelScale;
     float GyroOffset[3];
-	
+
     float AccelOffset[3];
-	
+
     float gNorm;
 } IMU_Data_t;
 
@@ -105,9 +91,7 @@ void BMI088_Init(SPI_HandleTypeDef *bmi088_SPI, uint8_t calibrate);
 extern uint8_t BMI088_init(SPI_HandleTypeDef *bmi088_SPI, uint8_t calibrate);
 extern uint8_t bmi088_accel_init(void);
 extern uint8_t bmi088_gyro_init(void);
-
 extern IMU_Data_t BMI088;
-
 extern void BMI088_Read(IMU_Data_t *bmi088);
 
 #endif

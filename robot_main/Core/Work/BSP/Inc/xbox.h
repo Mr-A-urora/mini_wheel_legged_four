@@ -11,7 +11,6 @@
 #define XBOX_CONTROLLER_INDEX_BUTTONS_CENTER 14
 #define XBOX_CONTROLLER_INDEX_BUTTONS_SHARE 15
 
-
 typedef struct xbox
 {
   uint8_t btnA, btnB, btnX, btnY;
@@ -23,12 +22,12 @@ typedef struct xbox
   // button on joy stick
   uint8_t btnLS, btnRS;
   uint8_t btnDirUp, btnDirLeft, btnDirRight, btnDirDown;
-  int16_t joyLHori ;
-  int16_t joyLVert ;
-  int16_t joyRHori ;
-  int16_t joyRVert ;
+  int16_t joyLHori;
+  int16_t joyLVert;
+  int16_t joyRHori;
+  int16_t joyRVert;
   uint16_t trigLT, trigRT;
-}_xbox_t;
+} _xbox_t;
 extern _xbox_t xbox;
 void Xbox_rx_buf_Handle(uint8_t *rx_buffer);
 

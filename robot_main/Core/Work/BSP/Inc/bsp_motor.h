@@ -5,8 +5,7 @@
 
 #define JOINT_MOTOR_RX_LEN 8
 #define WHEEL_MOTOR_RX_LEN 10
-#define constrain(x, max, min) ((x > max) ? (max) : (x < min) ? (min) \
-                                                              : (x))
+#define constrain(x, max, min) ((x > max) ? (max) : (x < min) ? (min) : (x))
 
 typedef struct
 {
@@ -33,6 +32,7 @@ typedef struct
     int error_code;
     uint8_t error_status;
 } _Motor_Param;
+
 typedef enum
 {
     CONTROL_MODE_CURRENT = 0,
@@ -43,27 +43,15 @@ typedef enum
     CONTROL_MODE_POSITION_TRAP = 5,
 } tControlMode;
 
-
-
-
 void Motorparam_updata(_Motor_Param *Motor, uint8_t *rx_buf, uint8_t rx_buf_len);
-
 void Enable_Motor_Report(uint8_t id);
-
 void Enable_Motor(uint8_t id);
-
 void Disable_Motor(uint8_t id);
-
 void Motor_Setmode(uint8_t id, uint8_t mode);
-
 void jointMotor_SetPosition(uint8_t id, uint8_t traj_vel, uint8_t traj_accel, uint8_t traj_decel, float position);
-
 void Motor_Setiq(uint8_t id, float iq);
-
 float WheelMotor_Torque2Iq(float t);
-
 float JointMotor_Torque2Iq(float t);
-
 float JointMotor_Iq2Torque(float iq);
 
 #endif

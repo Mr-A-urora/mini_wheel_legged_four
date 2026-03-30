@@ -1,24 +1,6 @@
-/**
-  *********************************************************************
-  * @file      ins_task.c/h
-  * @brief     ¸ÃÈÎÎñÊÇÓÃmahony·½·¨»ñÈ¡»úÌå×ËÌ¬£¬Í¬Ê±»ñÈ¡»úÌåÔÚ¾ø¶Ô×ø±êÏµÏÂµÄÔË¶¯¼ÓËÙ¶È
-  * @note
-  * @history
-  *
-  @verbatim
-  ==============================================================================
-
-  ==============================================================================
-  @endverbatim
-  *********************************************************************
-  */
-
 #include "ins_task.h"
-
 #include "QuaternionEKF.h"
-
 #include "mahony_filter.h"
-
 #include "cmsis_os.h"
 #include "bsp_dwt.h"
 
@@ -74,35 +56,34 @@ void INS_task(void)
 		INS.q[2] = mahony.q2;
 		INS.q[3] = mahony.q3;
 
-		// ½«ÖØÁ¦´Óµ¼º½×ø±êÏµn×ª»»µ½»úÌåÏµb,Ëæºó¸ù¾İ¼ÓËÙ¶È¼ÆÊı¾İ¼ÆËãÔË¶¯¼ÓËÙ¶È
+		// å°†é‡åŠ›çŸ¢é‡ä»åœ°çƒåæ ‡ç³»nè½¬æ¢åˆ°æœºä½“åæ ‡ç³»bï¼Œä»åŠ é€Ÿåº¦è®¡ä¸­å‡å»é‡åŠ›å¾—åˆ°è¿åŠ¨åŠ é€Ÿåº¦
 		float gravity_b[3];
 		EarthFrameToBodyFrame(gravity, gravity_b, INS.q);
-		for (uint8_t i = 0; i < 3; i++) // Í¬Ñù¹ıÒ»¸öµÍÍ¨ÂË²¨
+		for (uint8_t i = 0; i < 3; i++) // Í¬åŒæ—¶è¿›è¡Œä¸€é˜¶ä½é€šæ»¤æ³¢
 		{
 			INS.MotionAccel_b[i] = (INS.Accel[i] - gravity_b[i]) * ins_dt / (INS.AccelLPF + ins_dt) + INS.MotionAccel_b[i] * INS.AccelLPF / (INS.AccelLPF + ins_dt);
-			//			INS.MotionAccel_b[i] = (INS.Accel[i] ) * dt / (INS.AccelLPF + dt)
-			//														+ INS.MotionAccel_b[i] * INS.AccelLPF / (INS.AccelLPF + dt);
+			// INS.MotionAccel_b[i] = (INS.Accel[i] ) * dt / (INS.AccelLPF + dt) + INS.MotionAccel_b[i] * INS.AccelLPF / (INS.AccelLPF + dt);
 		}
-		BodyFrameToEarthFrame(INS.MotionAccel_b, INS.MotionAccel_n, INS.q); // ×ª»»»Øµ¼º½Ïµn
+		BodyFrameToEarthFrame(INS.MotionAccel_b, INS.MotionAccel_n, INS.q); // è½¬æ¢å›åœ°çƒåæ ‡ç³»n
 
-		// ËÀÇø´¦Àí
+		// è¿åŠ¨åŠ é€Ÿåº¦æ­»åŒºå¤„ç†
 		if (fabsf(INS.MotionAccel_n[0]) < 0.02f)
 		{
-			INS.MotionAccel_n[0] = 0.0f; // xÖá
+			INS.MotionAccel_n[0] = 0.0f; // xï¿½ï¿½
 		}
 		if (fabsf(INS.MotionAccel_n[1]) < 0.02f)
 		{
-			INS.MotionAccel_n[1] = 0.0f; // yÖá
+			INS.MotionAccel_n[1] = 0.0f; // yï¿½ï¿½
 		}
 		if (fabsf(INS.MotionAccel_n[2]) < 0.04f)
 		{
-			INS.MotionAccel_n[2] = 0.0f; // zÖá
+			INS.MotionAccel_n[2] = 0.0f; // zï¿½ï¿½
 		}
 
 		if (ins_time > 3000.0f)
 		{
-			INS.ins_flag = 1; // ËÄÔªÊı»ù±¾ÊÕÁ²£¬¼ÓËÙ¶ÈÒ²»ù±¾ÊÕÁ²£¬¿ÉÒÔ¿ªÊ¼µ×ÅÌÈÎÎñ
-			// »ñÈ¡×îÖÕÊı¾İ
+			INS.ins_flag = 1; // å››å…ƒæ•°æ”¶æ•›å®Œæˆï¼ŒåŠ é€Ÿåº¦è®¡å’Œé™€èºä»ªæ•°æ®å·²èåˆï¼Œå¯ä»¥å¼€å§‹ç§¯åˆ†
+			// è·å–å§¿æ€è§’
 			INS.Pitch = mahony.roll;
 			INS.Roll = mahony.pitch;
 			INS.Yaw = mahony.yaw;

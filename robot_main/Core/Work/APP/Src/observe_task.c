@@ -1,55 +1,39 @@
-/**
-  *********************************************************************
-  * @file      observe_task.c/h
-  * @brief     ¸ÃÈÎÎñÊÇ¶Ô»úÌåÔË¶¯ËÙ¶È¹À¼Æ£¬ÓÃÓÚÒÖÖÆ´ò»¬
-  * @note
-  * @history
-  *
-  @verbatim
-  ==============================================================================
-
-  ==============================================================================
-  @endverbatim
-  *********************************************************************
-  */
-
 #include "observe_task.h"
-
 #include "cmsis_os.h"
-
 #include "ins_task.h"
 #include "chassis_task.h"
 
 #define Wheel_Radius 0.049f
 
-KalmanFilter_t vaEstimateKF; // ¿¨¶ûÂüÂË²¨Æ÷½á¹¹Ìå
+KalmanFilter_t vaEstimateKF; // é€Ÿåº¦åŠ é€Ÿåº¦å¡å°”æ›¼æ»¤æ³¢å™¨ç»“æ„ä½“
 
 float vaEstimateKF_F[4] = {1.0f, 0.003f,
-                           0.0f, 1.0f}; // ×´Ì¬×ªÒÆ¾ØÕó£¬¿ØÖÆÖÜÆÚÎª0.001s
+                           0.0f, 1.0f}; // çŠ¶æ€è½¬ç§»çŸ©é˜µï¼Œæ§åˆ¶å‘¨æœŸä¸º0.001s
 
 float vaEstimateKF_P[4] = {1.0f, 0.0f,
-                           0.0f, 1.0f}; // ºóÑé¹À¼ÆĞ­·½²î³õÊ¼Öµ
+                           0.0f, 1.0f}; // è¯¯å·®åæ–¹å·®çŸ©é˜µåˆå§‹å€¼
 
 float vaEstimateKF_Q[4] = {0.5f, 0.0f,
-                           0.0f, 0.5f}; // Q¾ØÕó³õÊ¼Öµ
+                           0.0f, 0.5f}; // QçŸ©é˜µåˆå§‹å€¼ï¼ˆè¿‡ç¨‹å™ªå£°åæ–¹å·®ï¼‰
 
 float vaEstimateKF_R[4] = {100.0f, 0.0f,
-                           0.0f, 100.0f};
+                           0.0f, 100.0f}; // RçŸ©é˜µåˆå§‹å€¼ï¼ˆæµ‹é‡å™ªå£°åæ–¹å·®ï¼‰
 
-float vaEstimateKF_K[4];
+float vaEstimateKF_K[4]; // å¡å°”æ›¼å¢ç›ŠçŸ©é˜µ
 
 const float vaEstimateKF_H[4] = {1.0f, 0.0f,
-                                 0.0f, 1.0f}; // ÉèÖÃ¾ØÕóHÎª³£Á¿
+                                 0.0f, 1.0f}; // è§‚æµ‹çŸ©é˜µHä¸ºå•ä½é˜µ
 
 // extern vmc_leg_t right;
 // extern vmc_leg_t left;
 
-float vel_acc[2];
-uint32_t OBSERVE_TIME = 3; // ÈÎÎñÖÜÆÚ
+float vel_acc[2]; // æ»¤æ³¢åçš„é€Ÿåº¦åŠ é€Ÿåº¦å€¼
+uint32_t OBSERVE_TIME = 3; // è§‚æµ‹å‘¨æœŸï¼ˆmsï¼‰
 void Observe_task(void)
 {
   while (INS.ins_flag == 0)
-  { // µÈ´ı¼ÓËÙ¶ÈÊÕÁ²
+  { 
+    // ç­‰å¾…IMUåˆå§‹åŒ–å®Œæˆ
     osDelay(1);
   }
   static float wr, wl = 0.0f;
@@ -60,24 +44,23 @@ void Observe_task(void)
 
   while (1)
   {
-    //Ë³Ê±ÕëÎªÕı
-		 wr = -chassis.Wheelmotor[1].speed_buck - INS.Gyro[0];
-		 vrb = wr * Wheel_Radius;
+    // é¡ºæ—¶é’ˆä¸ºæ­£æ–¹å‘
+    wr = -chassis.Wheelmotor[1].speed_buck - INS.Gyro[0];
+    vrb = wr * Wheel_Radius;
 
-		 wl = -chassis.Wheelmotor[0].speed_buck + INS.Gyro[0];
-		 vlb = wl * Wheel_Radius;
+    wl = -chassis.Wheelmotor[0].speed_buck + INS.Gyro[0];
+    vlb = wl * Wheel_Radius;
 
+    aver_v = (vrb - vlb) / 2.0f; // È¡Æ½ï¿½ï¿½
+    xvEstimateKF_Update(&vaEstimateKF, INS.MotionAccel_n[1], aver_v);
 
-		 aver_v = (vrb - vlb) / 2.0f; // È¡Æ½¾ù
-		 xvEstimateKF_Update(&vaEstimateKF, INS.MotionAccel_n[1], aver_v);
+    // åŸæœ¬æ—‹è½¬çš„è¿‡ç¨‹ä¸­v_filterå’Œx_filteråº”è¯¥éƒ½ä¸º0
+    chassis.v_filter.cur = vel_acc[0]; // å¾—åˆ°ç»è¿‡å¡å°”æ›¼æ»¤æ³¢åçš„é€Ÿåº¦
+    chassis.x_filter.cur = chassis.x_filter.cur + chassis.v_filter.cur * ((float)OBSERVE_TIME / 1000.0f);
 
-		 //Ô­µØ×Ô×ªµÄ¹ı³ÌÖĞv_filterºÍx_filterÓ¦¸Ã¶¼ÊÇÎª0
-		 chassis.v_filter.cur=vel_acc[0];//µÃµ½¿¨¶ûÂüÂË²¨ºóµÄËÙ¶È
-		 chassis.x_filter.cur=chassis.x_filter.cur+chassis.v_filter.cur*((float)OBSERVE_TIME/1000.0f);
-
-    // Èç¹ûÏëÖ±½ÓÓÃÂÖ×ÓËÙ¶È£¬²»×öÈÚºÏµÄ»°¿ÉÒÔÕâÑù
-//    chassis.v_filter.cur = (-chassis.Wheelmotor[1].speed_buck + chassis.Wheelmotor[0].speed_buck) * Wheel_Radius * 0.5f; // 0.0603ÊÇÂÖ×Ó°ë¾¶£¬µç»ú·´À¡µÄÊÇ½ÇËÙ¶È£¬³Ë°ë¾¶ºóµÃµ½ÏßËÙ¶È£¬ÊıÑ§Ä£ĞÍÖĞ¶¨ÒåµÄÊÇÂÖ×ÓË³Ê±ÕëÎªÕı£¬ËùÒÔÒª³Ë¸ö¸ººÅ
-//    chassis.x_filter.cur = chassis.x_filter.cur + chassis.v_filter.cur * ((float)OBSERVE_TIME / 1000.0f);
+    // å¤‡ç”¨æ–¹æ¡ˆï¼šç›´æ¥ä½¿ç”¨è½®é€Ÿè®¡ç®—é€Ÿåº¦ï¼Œä½œä¸ºèåˆçš„åŸºç¡€å‚è€ƒ
+    //    chassis.v_filter.cur = (-chassis.Wheelmotor[1].speed_buck + chassis.Wheelmotor[0].speed_buck) * Wheel_Radius * 0.5f; // 0.0603ä¸ºè½®èƒåŠå¾„ï¼Œé™€èºä»ªè¾“å‡ºçš„æ˜¯è§’é€Ÿåº¦ï¼Œä¹˜åŠå¾„å¾—åˆ°çº¿é€Ÿåº¦ï¼Œæ•°å­¦æ¨¡å‹ä¸­çš„æ–¹å‘è§„å®šé¡ºæ—¶é’ˆä¸ºæ­£ï¼Œæ­¤å¤„éœ€è¦å–å
+    //    chassis.x_filter.cur = chassis.x_filter.cur + chassis.v_filter.cur * ((float)OBSERVE_TIME / 1000.0f);
 
     osDelay(OBSERVE_TIME);
   }
@@ -85,7 +68,7 @@ void Observe_task(void)
 
 void xvEstimateKF_Init(KalmanFilter_t *EstimateKF)
 {
-  Kalman_Filter_Init(EstimateKF, 2, 0, 2); // ×´Ì¬ÏòÁ¿2Î¬ Ã»ÓĞ¿ØÖÆÁ¿ ²âÁ¿ÏòÁ¿2Î¬
+  Kalman_Filter_Init(EstimateKF, 2, 0, 2); // çŠ¶æ€é‡2ç»´ï¼Œæ— æ§åˆ¶é‡ï¼Œè§‚æµ‹é‡2ç»´
 
   memcpy(EstimateKF->F_data, vaEstimateKF_F, sizeof(vaEstimateKF_F));
   memcpy(EstimateKF->P_data, vaEstimateKF_P, sizeof(vaEstimateKF_P));
@@ -96,14 +79,14 @@ void xvEstimateKF_Init(KalmanFilter_t *EstimateKF)
 
 void xvEstimateKF_Update(KalmanFilter_t *EstimateKF, float acc, float vel)
 {
-  // ¿¨¶ûÂüÂË²¨Æ÷²âÁ¿Öµ¸üĞÂ
-  EstimateKF->MeasuredVector[0] = vel; // ²âÁ¿ËÙ¶È
-  EstimateKF->MeasuredVector[1] = acc; // ²âÁ¿¼ÓËÙ¶È
+  // è®¾ç½®å¡å°”æ›¼æ»¤æ³¢å™¨æµ‹é‡å€¼è¾“å…¥
+  EstimateKF->MeasuredVector[0] = vel; // ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
+  EstimateKF->MeasuredVector[1] = acc; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
 
-  // ¿¨¶ûÂüÂË²¨Æ÷¸üĞÂº¯Êı
+  // è¿è¡Œå¡å°”æ›¼æ»¤æ³¢å™¨æ›´æ–°å‡½æ•°
   Kalman_Filter_Update(EstimateKF);
 
-  // ÌáÈ¡¹À¼ÆÖµ
+  // è·å–æ»¤æ³¢å€¼
   for (uint8_t i = 0; i < 2; i++)
   {
     vel_acc[i] = EstimateKF->FilteredValue[i];

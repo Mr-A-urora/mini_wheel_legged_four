@@ -13,7 +13,7 @@
 #define l4 0.05872f
 #define l23 0.02958f
 extern uint8_t start_flag;
-uint8_t jump_flag=0;
+uint8_t jump_flag = 0;
 // #define LEG_Position
 
 #define Min_Leg_Hight 0.075f
@@ -38,7 +38,8 @@ static uint8_t jump_time = 0;
 void vmc_task(void)
 {
   while (INS.ins_flag == 0)
-  { // 等待加速度收敛
+  { 
+    // 等待加速度收敛
     osDelay(1);
   }
   PID_init(&VMC_PID[0], PID_POSITION, vmc_pid_param, 30.0f, 5.0f);
@@ -69,10 +70,10 @@ void vmc_task(void)
   while (1)
   {
 
-    if(xbox.btnShare_falling)
+    if (xbox.btnShare_falling)
     {
-      xbox.btnShare_falling=0;
-      jump_flag=1;
+      xbox.btnShare_falling = 0;
+      jump_flag = 1;
     }
     VMC_PID[0].Kp = VMC_PID[1].Kp = vmc_pid_param[0];
     VMC_PID[0].Ki = VMC_PID[1].Ki = vmc_pid_param[1];
@@ -127,76 +128,76 @@ void vmc_task(void)
 
     if (jump_flag == 1)
     {
-      chassis.v_filter.err=0;
-      chassis.x_filter.err=0;
-      VMC_PID[0].out=constrain(VMC_PID[0].out,30.0,-30.0);
-      VMC_PID[1].out=constrain(VMC_PID[1].out,30.0,-30.0);
+      chassis.v_filter.err = 0;
+      chassis.x_filter.err = 0;
+      VMC_PID[0].out = constrain(VMC_PID[0].out, 30.0, -30.0);
+      VMC_PID[1].out = constrain(VMC_PID[1].out, 30.0, -30.0);
       chassis.Jointmotor[0].iq_set = JointMotor_Torque2Iq((Robot_Body_Weight + VMC_PID[0].out + Roll_Contorl_PID.out) * robot[0].JointForce_Virtual2Real_K);
       chassis.Jointmotor[1].iq_set = JointMotor_Torque2Iq((Robot_Body_Weight + VMC_PID[1].out - Roll_Contorl_PID.out) * robot[1].JointForce_Virtual2Real_K);
-        switch (step)
+      switch (step)
+      {
+      case 0:
+        robot[0].virtual_leg_length_set = robot[1].virtual_leg_length_set = Min_Leg_Hight;
+        Motor_Setiq(chassis.Jointmotor[0].id, -chassis.Jointmotor[0].iq_set);
+        Motor_Setiq(chassis.Jointmotor[1].id, chassis.Jointmotor[1].iq_set);
+        step = 1;
+      case 1:
+        if (robot[0].virtual_leg_length_back < Min_Leg_Hight + 0.005 && robot[1].virtual_leg_length_back < Min_Leg_Hight + 0.005)
         {
-        case 0:
+          jump_time++;
+        }
+        if (jump_time > 5)
+        {
+          step = 2;
+          jump_time = 0;
+        }
+        Motor_Setiq(chassis.Jointmotor[0].id, -chassis.Jointmotor[0].iq_set);
+        Motor_Setiq(chassis.Jointmotor[1].id, chassis.Jointmotor[1].iq_set);
+        break;
+      case 2:
+        robot[0].virtual_leg_length_set = robot[1].virtual_leg_length_set = Max_Leg_Hight + 0.005;
+        Motor_Setiq(chassis.Jointmotor[0].id, -chassis.Jointmotor[0].iq_set);
+        Motor_Setiq(chassis.Jointmotor[1].id, chassis.Jointmotor[1].iq_set);
+        step = 3;
+        break;
+      case 3:
+        if (robot[0].virtual_leg_length_back > Max_Leg_Hight - 0.005 && robot[1].virtual_leg_length_back > Max_Leg_Hight - 0.005)
+        {
+          step = 4;
           robot[0].virtual_leg_length_set = robot[1].virtual_leg_length_set = Min_Leg_Hight;
           Motor_Setiq(chassis.Jointmotor[0].id, -chassis.Jointmotor[0].iq_set);
           Motor_Setiq(chassis.Jointmotor[1].id, chassis.Jointmotor[1].iq_set);
-          step = 1;
-        case 1:
-          if (robot[0].virtual_leg_length_back < Min_Leg_Hight+0.005 && robot[1].virtual_leg_length_back < Min_Leg_Hight+0.005)
-          {
-            jump_time++;
-          }
-          if (jump_time > 5)
-          {
-            step = 2;
-            jump_time = 0;
-          }
-          Motor_Setiq(chassis.Jointmotor[0].id, -chassis.Jointmotor[0].iq_set);
-          Motor_Setiq(chassis.Jointmotor[1].id, chassis.Jointmotor[1].iq_set);
-          break;
-        case 2:
-          robot[0].virtual_leg_length_set = robot[1].virtual_leg_length_set = Max_Leg_Hight+0.005;
-          Motor_Setiq(chassis.Jointmotor[0].id, -chassis.Jointmotor[0].iq_set);
-          Motor_Setiq(chassis.Jointmotor[1].id, chassis.Jointmotor[1].iq_set);
-          step = 3;
-          break;
-        case 3:
-          if (robot[0].virtual_leg_length_back > Max_Leg_Hight-0.005 && robot[1].virtual_leg_length_back > Max_Leg_Hight-0.005)
-          {
-            step = 4;
-            robot[0].virtual_leg_length_set = robot[1].virtual_leg_length_set = Min_Leg_Hight;
-            Motor_Setiq(chassis.Jointmotor[0].id, -chassis.Jointmotor[0].iq_set);
-            Motor_Setiq(chassis.Jointmotor[1].id, chassis.Jointmotor[1].iq_set);
-          }
-          else
-          {
-            robot[0].virtual_leg_length_set = robot[1].virtual_leg_length_set = Max_Leg_Hight+0.005;
-            Motor_Setiq(chassis.Jointmotor[0].id, -chassis.Jointmotor[0].iq_set);
-            Motor_Setiq(chassis.Jointmotor[1].id, chassis.Jointmotor[1].iq_set);
-          }
-          break;
-        case 4:
-          Motor_Setiq(chassis.Jointmotor[0].id, -chassis.Jointmotor[0].iq_set);
-          Motor_Setiq(chassis.Jointmotor[1].id, chassis.Jointmotor[1].iq_set);
-          if (robot[0].virtual_leg_length_back < Min_Leg_Hight+0.01 && robot[1].virtual_leg_length_back < Min_Leg_Hight+0.01)
-          {
-            robot[0].virtual_leg_length_set = robot[1].virtual_leg_length_set = 0.13;
-            jump_time++;
-          }
-          if (jump_time > 5)
-          {
-            step = 5;
-            jump_time = 0;
-          }
-          break;
-          case 5:
-          Motor_Setiq(chassis.Jointmotor[0].id, -chassis.Jointmotor[0].iq_set);
-          Motor_Setiq(chassis.Jointmotor[1].id, chassis.Jointmotor[1].iq_set);
-          jump_flag=0;
-          step=0;
-          break;
-        default:
-          break;
         }
+        else
+        {
+          robot[0].virtual_leg_length_set = robot[1].virtual_leg_length_set = Max_Leg_Hight + 0.005;
+          Motor_Setiq(chassis.Jointmotor[0].id, -chassis.Jointmotor[0].iq_set);
+          Motor_Setiq(chassis.Jointmotor[1].id, chassis.Jointmotor[1].iq_set);
+        }
+        break;
+      case 4:
+        Motor_Setiq(chassis.Jointmotor[0].id, -chassis.Jointmotor[0].iq_set);
+        Motor_Setiq(chassis.Jointmotor[1].id, chassis.Jointmotor[1].iq_set);
+        if (robot[0].virtual_leg_length_back < Min_Leg_Hight + 0.01 && robot[1].virtual_leg_length_back < Min_Leg_Hight + 0.01)
+        {
+          robot[0].virtual_leg_length_set = robot[1].virtual_leg_length_set = 0.13;
+          jump_time++;
+        }
+        if (jump_time > 5)
+        {
+          step = 5;
+          jump_time = 0;
+        }
+        break;
+      case 5:
+        Motor_Setiq(chassis.Jointmotor[0].id, -chassis.Jointmotor[0].iq_set);
+        Motor_Setiq(chassis.Jointmotor[1].id, chassis.Jointmotor[1].iq_set);
+        jump_flag = 0;
+        step = 0;
+        break;
+      default:
+        break;
+      }
     }
     else
     {

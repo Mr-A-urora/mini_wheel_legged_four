@@ -1,15 +1,3 @@
-/**
- ******************************************************************************
- * @file    ins_task.h
- * @author  Wang Hongxi
- * @version V2.0.0
- * @date    2022/2/23
- * @brief
- ******************************************************************************
- * @attention
- *
- ******************************************************************************
- */
 #ifndef __INS_TASK_H
 #define __INS_TASK_H
 
@@ -25,16 +13,15 @@
 
 typedef struct
 {
-    float q[4]; // ËÄÔªÊı¹À¼ÆÖµ
+    float q[4]; // å››å…ƒæ•°å®éƒ¨å’Œè™šéƒ¨
 
-    float Gyro[3];          // ½ÇËÙ¶È
-    float Accel[3];         // ¼ÓËÙ¶È
-    float MotionAccel_b[3]; // »úÌå×ø±ê¼ÓËÙ¶È
-    float MotionAccel_n[3]; // ¾ø¶ÔÏµ¼ÓËÙ¶È
+    float Gyro[3];          // é™€èºä»ªè§’é€Ÿåº¦
+    float Accel[3];         // åŠ é€Ÿåº¦è®¡åŠ é€Ÿåº¦
+    float MotionAccel_b[3]; // æœºä½“åæ ‡ç³»è¿åŠ¨åŠ é€Ÿåº¦
+    float MotionAccel_n[3]; // å¯¼èˆªåæ ‡ç³»è¿åŠ¨åŠ é€Ÿåº¦
+    float AccelLPF; // åŠ é€Ÿåº¦ä½é€šæ»¤æ³¢ç³»æ•°
 
-    float AccelLPF; // ¼ÓËÙ¶ÈµÍÍ¨ÂË²¨ÏµÊı
-
-    // ¼ÓËÙ¶ÈÔÚ¾ø¶ÔÏµµÄÏòÁ¿±íÊ¾
+    // åŠ é€Ÿåº¦åœ¨æƒ¯æ€§åæ ‡ç³»ä¸­çš„è¡¨ç¤º
     float xn[3];
     float yn[3];
     float zn[3];
@@ -42,7 +29,7 @@ typedef struct
     float atanxz;
     float atanyz;
 
-    // Î»×Ë
+    // å§¿æ€è§’
     float Roll;
     float Pitch;
     float Yaw;
@@ -50,14 +37,14 @@ typedef struct
     float YawAngleLast;
     float YawRoundCount;
 
-    float v_n; // ¾ø¶ÔÏµÑØ×ÅË®Æ½ÔË¶¯·½ÏòµÄËÙ¶È
-    float x_n; // ¾ø¶ÔÏµÑØ×ÅË®Æ½ÔË¶¯·½ÏòµÄÎ»ÒÆ
+    float v_n; // å¯¼èˆªåæ ‡ç³»æ°´å¹³è¿åŠ¨é€Ÿåº¦
+    float x_n; // å¯¼èˆªåæ ‡ç³»æ°´å¹³è¿åŠ¨ä½ç§»
 
-    uint8_t ins_flag;
+    uint8_t ins_flag; // INSåˆå§‹åŒ–å®Œæˆæ ‡å¿—
 } INS_t;
 
 /**
- * @brief ÓÃÓÚĞŞÕı°²×°Îó²îµÄ²ÎÊı,demoÖĞ¿ÉÎŞÊÓ
+ * @brief æƒ¯æ€§æµ‹é‡å•å…ƒå‚æ•°ç»“æ„ä½“ï¼Œdemoä¸­å¯å¿½ç•¥
  *
  */
 typedef struct
