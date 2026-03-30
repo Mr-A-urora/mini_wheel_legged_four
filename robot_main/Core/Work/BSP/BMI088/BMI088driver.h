@@ -45,13 +45,22 @@
 #define BMI088_GYRO_125_SEN 0.000066579027251980956150958662738366f
 
 // 需手动修改
-#define GxOFFSET 0.0f
-#define GyOFFSET 0.0f
-#define GzOFFSET 0.0f
-#define AxOFFSET 0.09f
-#define AyOFFSET 0.2f
+#define GxOFFSET 0.00180152827f
+#define GyOFFSET 0.000545416377f
+#define GzOFFSET -0.00147822534f
+#define AxOFFSET 0.0302134994f
+#define AyOFFSET -0.180137232f
 #define AzOFFSET 0.0f//Z轴先不减去零飘值，因为零飘值包含重力加速度的值
-#define gNORM 9.8f
+#define gNORM 9.84484291f
+
+
+//#define GxOFFSET -0.002378364326f
+//#define GyOFFSET -0.004670696799f
+//#define GzOFFSET 0.000276081410f
+//#define AxOFFSET 0.17332880855f
+//#define AyOFFSET 0.123745501041f
+//#define AzOFFSET 0.0f//Z轴先不减去零飘值，因为零飘值包含重力加速度的值
+//#define gNORM 9.799211502075f
 
 typedef struct
 {
