@@ -76,8 +76,8 @@ void Chassis_task(void)
         // chassis.Wheelmotor[1].torque_set = (K_Matrix[0] * chassis.pitch.err + K_Matrix[1] * chassis.d_pitch.err + K_Matrix[2] * chassis.x_filter.err + K_Matrix[3] * chassis.v_filter.err);
 
         Angle_PID_calc(&TURN_PID, INS.YawTotalAngle, yaw_init, INS.Gyro[2]);
-        chassis.Wheelmotor[0].iq_set = -(WheelMotor_Torque2Iq(chassis.Wheelmotor[0].torque_set) - TURN_PID.out);
-        chassis.Wheelmotor[1].iq_set = +(WheelMotor_Torque2Iq(chassis.Wheelmotor[1].torque_set) + TURN_PID.out);
+        chassis.Wheelmotor[0].iq_set = +(WheelMotor_Torque2Iq(chassis.Wheelmotor[0].torque_set) + TURN_PID.out);  // 交换左右轮控制方向
+        chassis.Wheelmotor[1].iq_set = -(WheelMotor_Torque2Iq(chassis.Wheelmotor[1].torque_set) - TURN_PID.out);  // 交换左右轮控制方向
         if ((robot[0].liftoff_flag & robot[1].liftoff_flag) == 1)
         {
             chassis.Wheelmotor[0].iq_set = 0;
@@ -128,7 +128,7 @@ void Get_Control_Tar_Info(void)
         yaw_init += -xbox.joyLHori * 0.01 * 0.0004;
     }
     // chassis.pitch.tar = -0.02-0.00016/(robot[0].virtual_leg_length_back+robot[1].virtual_leg_length_back)*0.5;
-    chassis.pitch.tar = -0.01;
+    chassis.pitch.tar = 0.131;
     chassis.d_pitch.tar = 0;
 
     chassis.v_filter.tar = xbox.joyLVert * 0.01 * 0.002;

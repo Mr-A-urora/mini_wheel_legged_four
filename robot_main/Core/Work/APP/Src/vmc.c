@@ -22,7 +22,7 @@ uint8_t jump_flag = 0;
 #define VMC_Locked_IQ 0.0f
 #define VMC_Init_Angle 1.256637f /*The Angle between the big_leg and the vertical*/
 VMC_t robot[2];
-float vmc_pid_param[3] = {500, 0, -5};
+float vmc_pid_param[3] = {600, 5, -5};
 pid_type_def VMC_PID[2];
 float roll_set = 0;
 float roll_pid_param[3] = {-20, 0, 1};
@@ -208,8 +208,8 @@ void vmc_task(void)
         VMC_PID[1].out = constrain(VMC_PID[1].out, 20.0, -20.0);
         chassis.Jointmotor[0].iq_set = JointMotor_Torque2Iq((Robot_Body_Weight + VMC_PID[0].out + Roll_Contorl_PID.out) * robot[0].JointForce_Virtual2Real_K);
         chassis.Jointmotor[1].iq_set = JointMotor_Torque2Iq((Robot_Body_Weight + VMC_PID[1].out - Roll_Contorl_PID.out) * robot[1].JointForce_Virtual2Real_K);
-        robot[0].virtual_leg_length_set += xbox.joyRVert * 0.01 * 0.000001 * 0.5;
-        robot[1].virtual_leg_length_set += xbox.joyRVert * 0.01 * 0.000001 * 0.5;
+        robot[0].virtual_leg_length_set += xbox.joyRVert * 0.01 * 0.000001 * 0.5;  // 修正pitch轴方向
+        robot[1].virtual_leg_length_set += xbox.joyRVert * 0.01 * 0.000001 * 0.5;  // 修正pitch轴方向
         roll_set = xbox.joyRHori * 0.01 * 0.001;
         roll_set = constrain(roll_set, 0.6, -0.6);
         robot[0].virtual_leg_length_set = constrain(robot[0].virtual_leg_length_set, Max_Leg_Hight, Min_Leg_Hight);
