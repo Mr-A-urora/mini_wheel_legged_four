@@ -5,7 +5,7 @@
 #include "pid.h"
 #define M_PI 3.1415926f
 
-#define Robot_Body_Weight 1.45 / 2 * 9.8
+#define Robot_Body_Weight 1.8 / 2 * 9.8
 #define Robot_Wheel_Weight 0.3 * 9.8
 
 typedef struct VMC

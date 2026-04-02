@@ -128,7 +128,7 @@ void Get_Control_Tar_Info(void)
         yaw_init += -xbox.joyLHori * 0.01 * 0.0004;
     }
     // chassis.pitch.tar = -0.02-0.00016/(robot[0].virtual_leg_length_back+robot[1].virtual_leg_length_back)*0.5;
-    chassis.pitch.tar = 0.131;
+    chassis.pitch.tar = -0.01;
     chassis.d_pitch.tar = 0;
 
     chassis.v_filter.tar = xbox.joyLVert * 0.01 * 0.002;
