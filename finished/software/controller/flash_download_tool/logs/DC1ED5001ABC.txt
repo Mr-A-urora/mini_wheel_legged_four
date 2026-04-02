@@ -1,0 +1,137 @@
+*************************** START ****************************
+Chip: ESP32C3
+Download mode: usb
+Start time: 20250622-22:35
+Connect baud: 115200
+Com:COM9
+connecting...
+manufacturer_id: 0x0
+device_id: 0x0
+fs:0x0
+
+Leaving...
+com closed
+Total use time: 4 s
+Download result: PASS
+*************************** END ****************************
+
+*************************** START ****************************
+Chip: ESP32C3
+Download mode: usb
+Start time: 20250622-22:35
+Connect baud: 115200
+Com:COM9
+connecting...
+manufacturer_id: 0x0
+device_id: 0x0
+fs:0x0
+
+Leaving...
+com closed
+Total use time: 4 s
+Download result: PASS
+*************************** END ****************************
+
+*************************** START ****************************
+Chip: ESP32C3
+Download mode: uart
+Start time: 20250622-22:59
+Connect baud: 115200
+Com:COM9
+connecting...
+manufacturer_id: 0x0
+device_id: 0x0
+*************************** START ****************************
+Chip: ESP32C3
+Download mode: usb
+Start time: 20250622-23:00
+Connect baud: 115200
+Com:COM9
+connecting...
+manufacturer_id: 0x0
+device_id: 0x0
+*************************** START ****************************
+Chip: ESP32C3
+Download mode: usb
+Start time: 20250622-23:02
+Connect baud: 115200
+Com:COM9
+connecting...
+manufacturer_id: 0x0
+device_id: 0x0
+fs:0x0
+
+Leaving...
+com closed
+Total use time: 4 s
+Download result: PASS
+*************************** END ****************************
+
+*************************** START ****************************
+Chip: ESP32C3
+Download mode: usb
+Start time: 20250622-23:02
+Connect baud: 115200
+Com:COM9
+connecting...
+manufacturer_id: 0x0
+device_id: 0x0
+set STOP FLG: Trueset STOP FLG: Trueset state: ESP_DL_STOP
+*************************** START ****************************
+Chip: ESP32C3
+Download mode: usb
+Start time: 20250622-23:03
+Connect baud: 115200
+Com:COM9
+connecting...
+manufacturer_id: 0x0
+device_id: 0x0
+fs:0x0
+
+Leaving...
+com closed
+Total use time: 4 s
+Download result: PASS
+*************************** END ****************************
+
+*************************** START ****************************
+Chip: ESP32C3
+Download mode: usb
+Start time: 20250622-23:05
+Connect baud: 115200
+Com:COM9
+serial port open error
+*************************** START ****************************
+Chip: ESP32C3
+Download mode: usb
+Start time: 20250622-23:06
+Connect baud: 115200
+Com:COM9
+connecting...
+manufacturer_id: 0x0
+device_id: 0x0
+fs:0x0
+
+Leaving...
+com closed
+Total use time: 4 s
+Download result: PASS
+*************************** END ****************************
+
+*************************** START ****************************
+Chip: ESP32C3
+Download mode: usb
+Start time: 20250622-23:06
+Connect baud: 115200
+Com:COM9
+connecting...
+manufacturer_id: 0x0
+device_id: 0x0
+fs:0x0
+
+Leaving...
+com closed
+Total use time: 4 s
+Download result: PASS
+*************************** END ****************************
+

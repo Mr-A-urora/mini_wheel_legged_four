@@ -1,113 +1,250 @@
-# 操作系统文件
-.DS_Store
-Thumbs.db
+# ===============================
+# 嵌入式开发（Embedded）
+# ===============================
+
+# 编译生成的文件
+*.o
+*.obj
+*.exe
+*.elf
+*.hex
+*.bin
+*.map
+*.lst
+*.crf
+*.d
+*.axf
+*.srec
+*.out
+
+# IDE生成的文件
+/.idea/
+/.vscode/
+*.suo
+*.user
+*.sdf
+*.opendb
+*.db_wp
+*.wpk
+*.launch
+*.plg
+*.ncb
+*.opt
+*.psess
+*.ilk
+*.pch
+*.pdb
+*.exp
+*.lib
+
+# Keil MDK
+*.uvgui*
+*.uvopt
+*.uvproj.*
+*.uvguix.*
+*.uvoptx
+*.scvd
+*.dep
+*.crf
+*.depend
+*.bak
+*.lnp
+*.htm
+
+# IAR EWARM
+*.ewp.*
+*.ewd.*
+*.ewt.*
+*.eww.*
+*.dep
+*.dve
+*.log
+*.cspy.bat
+*.sim
+
+# STM32CubeIDE / Eclipse
+.cproject
+.project
+.metadata/
+.settings/
+*.launch
+
+# ARM GCC / Makefile 生成
+/build/
+/bin/
+/obj/
+/Debug/
+/Release/
+
+# 嵌入式专用临时文件
 *.swp
 *.swo
+*~
 
-# IDE 和编辑器文件
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
+# ===============================
+# 前端开发（Frontend）
+# ===============================
 
-# 前端相关
+# 依赖目录
 node_modules/
+jspm_packages/
+bower_components/
+
+# 编译生成的前端文件
+/dist/
+/build/
+/out/
+*.min.js
+*.min.css
+*.bundle.js
+*.chunk.js
+*.css.map
+*.js.map
+
+# 日志文件
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-dist/
-build/
+pnpm-debug.log*
+lerna-debug.log*
+
+# 环境变量文件
+.env
+.env.local
+.env.*.local
+
+# 打包文件
+*.tgz
+*.tar.gz
+*.zip
+
+# 测试覆盖率
+/coverage/
+.nyc_output/
+/.jest/
+/.vitest/
+
+# 缓存目录
 .cache/
 .parcel-cache/
+.next/
+.nuxt/
+/.vite/
 
-# 嵌入式开发 (Keil, ARM 等)
-*.uvproj
-*.uvopt
-*.uvprojx
-*.uvoptx
+# 框架相关临时文件
+/.svelte-kit/
+/.angular/
+/.react/
+
+# IDE（前端专用）
+*.sublime-*
+*.vscode/
+.idea/
+*.iml
+
+# OS 生成文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===============================
+# SW绘图（SolidWorks 及 CAD 相关）
+# ===============================
+
+# SolidWorks 临时文件
+*.sldasm
+*.sldprt
+*.slddrw
+~$*
 *.bak
-*.dep
-*.lst
-*.map
-*.hex
-*.bin
-*.out
-*.elf
-*.axf
-*.o
-*.d
-*.crf
-*.lnp
-*.mpf
-*.mpj
-*.uvgui.*
-*.scvd
-*.iex
-*.htm
-*.sct
-*.symdefs
-
-# 图纸和设计文件 (如果有生成的临时文件)
-*.tmp
-*.bak
-*.autosave
-
-# 日志文件
+*.err
 *.log
-logs/
+*.swp
+*.sldwzmgr
+*.sldwz
+
+# SolidWorks 备份与恢复
+*.swbk
+*.3dbackup
+
+# 模拟与仿真数据
+*.cwr
+*.cwm
+*.cwx
+*.fbd
+*.fcs
+*.out
+*.sim
+*.stl
+
+# 导出/中间文件
+*.dxf
+*.dwg
+*.step
+*.stp
+*.igs
+*.iges
+*.x_t
+*.x_b
+*.vda
+*.3mf
+
+# PDM / 协同缓存
+*.cce
+*.ccm
+*.cch
+.vault/
+PDMWorks/
+
+# eDrawings 临时文件
+*.eprt
+*.easm
+*.edrw
+
+# SolidWorks 选项与配置
+swxJRNL.*
+swxJRNL
+*.reg
+*.sldreg
+
+# 来自其他 CAD 软件的临时/备份文件
+*.backup
+*.old
+*.tmp
+*.temp
+*.log
+*.err
+
+# ===============================
+# 通用规则（交叉覆盖）
+# ===============================
+
+# 操作系统生成文件
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+*.swp
+*.swo
+*~
+
+# 压缩打包文件（选择性忽略，可根据需求调整）
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+
+# 所有备份文件
+*.bak
+*.backup
+*.old
+*.orig
+
+# 所有日志文件
+*.log
 
 # 临时文件
 *.tmp
 *.temp
-*~
-
-# 敏感信息
-.env
-.env.local
-.env.*.local
-secrets.json
-
-# 其他常见忽略
-*.exe
-*.dll
-*.so
-*.dylib
-*.a
-*.lib
-*.pdb
-*.ilk
-*.exp
-*.idb
-*.ipch
-*.sdf
-*.opensdf
-*.suo
-*.user
-*.aps
-*.pch
-*.vspscc
-*_i.c
-*_p.c
-*.ncb
-*.suo
-*.tlb
-*.tlh
-*.tmp_proj
-*.vspscc
-*.vssscc
-.builds
-*.pidb
-*.log
-*.svclog
-*.scc
 *.cache
-*.internal
-*.vsidx
-*.vsmdi
-*.userprefs
-*.nupkg
-*.snupkg
-packages/
-!packages/build/
-*.nuget.props
-*.nuget.targets

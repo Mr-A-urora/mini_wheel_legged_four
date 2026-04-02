@@ -76,8 +76,8 @@ void Chassis_task(void)
         // chassis.Wheelmotor[1].torque_set = (K_Matrix[0] * chassis.pitch.err + K_Matrix[1] * chassis.d_pitch.err + K_Matrix[2] * chassis.x_filter.err + K_Matrix[3] * chassis.v_filter.err);
 
         Angle_PID_calc(&TURN_PID, INS.YawTotalAngle, yaw_init, INS.Gyro[2]);
-        chassis.Wheelmotor[0].iq_set = +(WheelMotor_Torque2Iq(chassis.Wheelmotor[0].torque_set) + TURN_PID.out);  // 交换左右轮控制方向
-        chassis.Wheelmotor[1].iq_set = -(WheelMotor_Torque2Iq(chassis.Wheelmotor[1].torque_set) - TURN_PID.out);  // 交换左右轮控制方向
+        chassis.Wheelmotor[0].iq_set = +(WheelMotor_Torque2Iq(chassis.Wheelmotor[0].torque_set) + TURN_PID.out);
+        chassis.Wheelmotor[1].iq_set = -(WheelMotor_Torque2Iq(chassis.Wheelmotor[1].torque_set) - TURN_PID.out);
         if ((robot[0].liftoff_flag & robot[1].liftoff_flag) == 1)
         {
             chassis.Wheelmotor[0].iq_set = 0;
