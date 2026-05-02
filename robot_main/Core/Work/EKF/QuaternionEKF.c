@@ -1,3 +1,18 @@
+/**
+ ******************************************************************************
+ * @file    QuaternionEKF.c
+ * @author  Wang Hongxi
+ * @version V1.2.0
+ * @date    2022/3/8
+ * @brief   attitude update with gyro bias estimate and chi-square test
+ ******************************************************************************
+ * @attention
+ * 1st order LPF transfer function:
+ *     1
+ *  ———————
+ *  as + 1
+ ******************************************************************************
+ */
 #include "QuaternionEKF.h"
 
 QEKF_INS_t QEKF_INS;
@@ -89,8 +104,8 @@ void IMU_QuaternionEKF_Update(float gx, float gy, float gz, float ax, float ay, 
     }
 
     /*   F, number with * represent vals to be set
-    0      1*     2*     3*     4     5
-    6*     7      8*     9*    10    11
+     0      1*     2*     3*     4     5
+     6*     7      8*     9*    10    11
     12*    13*    14     15*    16    17
     18*    19*    20*    21     22    23
     24     25     26     27     28    29
@@ -227,8 +242,8 @@ static void IMU_QuaternionEKF_F_Linearization_P_Fading(KalmanFilter_t *kf)
         kf->xhatminus_data[i] *= qInvNorm;
     }
     /*  F, number with * represent vals to be set
-    0     1     2     3     4*     5*
-    6     7     8     9    10*    11*
+     0     1     2     3     4*     5*
+     6     7     8     9    10*    11*
     12    13    14    15    16*    17*
     18    19    20    21    22*    23*
     24    25    26    27    28     29
@@ -271,8 +286,8 @@ static void IMU_QuaternionEKF_SetH(KalmanFilter_t *kf)
 {
     static float doubleq0, doubleq1, doubleq2, doubleq3;
     /* H
-    0     1     2     3     4     5
-    6     7     8     9    10    11
+     0     1     2     3     4     5
+     6     7     8     9    10    11
     12    13    14    15    16    17
     last two cols are zero
     */

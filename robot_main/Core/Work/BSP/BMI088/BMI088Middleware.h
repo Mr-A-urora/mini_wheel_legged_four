@@ -4,7 +4,7 @@
 #include "main.h"
 
 #define BMI088_USE_SPI
-// #define BMI088_USE_IIC
+//#define BMI088_USE_IIC
 
 /*
 #define CS1_ACCEL_GPIO_Port ACCEL_NSS_GPIO_Port

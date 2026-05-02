@@ -7,10 +7,11 @@
 
 void Motorparam_updata(_Motor_Param *Motor, uint8_t *rx_buf, uint8_t rx_buf_len)
 {
+
     {
-        Motor->position_buck = data_to_float(&rx_buf[0]) * 2 * PI / Motor->reduction_ratio; // rad
+        Motor->position_buck = data_to_float(&rx_buf[0])*2*PI/Motor->reduction_ratio;//rad
         Motor->iq_buck = q510_to_float(&rx_buf[6]);
-        Motor->speed_buck = q510_to_float(&rx_buf[4]) * 2.0f * PI / Motor->reduction_ratio; // rad/s
+        Motor->speed_buck = q510_to_float(&rx_buf[4])*2.0f * PI/Motor->reduction_ratio;//rad/s
     }
 }
 
@@ -19,19 +20,16 @@ void Enable_Motor_Report(uint8_t id)
     uint8_t data[8] = {0};
     FDCAN1_Send_Msg(main_to_M_can | (CAN_CMD_NORMAL_REPORT << 4) | id, data, 1);
 }
-
 void Enable_Motor(uint8_t id)
 {
     uint8_t data[8] = {0};
     FDCAN1_Send_Msg(main_to_M_can | (CAN_CMD_MOTOR_ENABLE << 4) | id, data, 1);
 }
-
 void Disable_Motor(uint8_t id)
 {
     uint8_t data[8] = {0};
     FDCAN1_Send_Msg(main_to_M_can | (CAN_CMD_MOTOR_DISABLE << 4) | id, data, 1);
 }
-
 void Motor_Setmode(uint8_t id, uint8_t mode)
 {
     uint8_t data[8] = {0};
@@ -54,20 +52,17 @@ void Motor_Setiq(uint8_t id, float iq)
     float_to_data(iq, data);
     FDCAN1_Send_Msg(main_to_M_can | (CAN_CMD_SET_CURRENT << 4) | id, data, 8);
 }
-
 /*max 0.4nm k:0.2*/
 float WheelMotor_Torque2Iq(float t)
 {
     //    return t/0.2f;
     return t * 5.0f;
 }
-
 float JointMotor_Torque2Iq(float t)
 {
-    return t / 0.6f;
+    return t  / 0.6f;
 }
-
 float JointMotor_Iq2Torque(float iq)
 {
-    return iq * 0.6f;
+    return iq * 0.6f ;
 }

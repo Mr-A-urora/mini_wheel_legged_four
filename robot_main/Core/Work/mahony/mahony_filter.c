@@ -1,8 +1,15 @@
 #include "mahony_filter.h"
 
+/*************************************
+Íê³ÉÊ±¼ä£º2023Äê09ÔÂ02ÈÕ 
+¹¦ÄÜ½éÉÜ£ºÊµÏÖmahony×ËÌ¬½Ç½âËãËã·¨µÄÄ£¿é·â×°
+ÖªºõÕËºÅ£ºÁúµ¨Ò²
+BÕ¾ÕËºÅ£º»ªÄÏÐ¡»¢¶Ó
+***************************************/
+
 struct MAHONY_FILTER_t mahony_filter;
 
-// æ—‹è½¬çŸ©é˜µæ›´æ–°ï¼Œå°†åœ°çƒåæ ‡ç³» R è½¬æ¢åˆ°æœºä½“åæ ‡ç³» b çš„æ—‹è½¬çŸ©é˜µæ›´æ–°
+/*¼ÆËãÐý×ª¾ØÕó*///´óµØ×ø±êÏµ R ×ª»»µ½»úÌå×ø±êÏµ b µÄ×ø±ê×ª»»¾ØÕó
 void RotationMatrix_update(struct MAHONY_FILTER_t *mahony_filter)
 {
     float q1q1 = mahony_filter->q1 * mahony_filter->q1;
@@ -17,95 +24,100 @@ void RotationMatrix_update(struct MAHONY_FILTER_t *mahony_filter)
     float q2q3 = mahony_filter->q2 * mahony_filter->q3;
 
     mahony_filter->rMat[0][0] = 1.0f - 2.0f * q2q2 - 2.0f * q3q3;
-    mahony_filter->rMat[0][1] = 2.0f * (q1q2 - q0q3);
-    mahony_filter->rMat[0][2] = 2.0f * (q1q3 + q0q2);
+    mahony_filter->rMat[0][1] = 2.0f * (q1q2  -q0q3);
+    mahony_filter->rMat[0][2] = 2.0f * (q1q3 +q0q2);
 
-    mahony_filter->rMat[1][0] = 2.0f * (q1q2 + q0q3);
+    mahony_filter->rMat[1][0] = 2.0f * (q1q2 +q0q3);
     mahony_filter->rMat[1][1] = 1.0f - 2.0f * q1q1 - 2.0f * q3q3;
-    mahony_filter->rMat[1][2] = 2.0f * (q2q3 - q0q1);
+    mahony_filter->rMat[1][2] = 2.0f * (q2q3  -q0q1);
 
-    mahony_filter->rMat[2][0] = 2.0f * (q1q3 - q0q2);
-    mahony_filter->rMat[2][1] = 2.0f * (q2q3 + q0q1);
+    mahony_filter->rMat[2][0] = 2.0f * (q1q3  -q0q2);
+    mahony_filter->rMat[2][1] = 2.0f * (q2q3  +q0q1);
     mahony_filter->rMat[2][2] = 1.0f - 2.0f * q1q1 - 2.0f * q2q2;
 }
 
-// è¾“å…¥é™€èžºä»ªå’ŒåŠ é€Ÿåº¦è®¡çš„åŽŸå§‹æ•°æ®ï¼Œå­˜å…¥æ»¤æ³¢å™¨ç»“æž„ä½“
-void mahony_input(struct MAHONY_FILTER_t *mahony_filter, Axis3f gyro, Axis3f acc)
+// ½«ÍÓÂÝÒÇºÍ¼ÓËÙ¶È¼ÆµÄÊäÈëÖµ¸³ÓèÂË²¨Æ÷½á¹¹Ìå
+void mahony_input(struct MAHONY_FILTER_t *mahony_filter,Axis3f gyro,Axis3f acc)
 {
     mahony_filter->gyro = gyro;
     mahony_filter->acc = acc;
 }
 
-// ä½¿ç”¨Mahonyç®—æ³•æ›´æ–°æ»¤æ³¢å™¨çŠ¶æ€
+// Ê¹ÓÃMahonyËã·¨¸üÐÂÂË²¨Æ÷×´Ì¬
 void mahony_update(struct MAHONY_FILTER_t *mahony_filter)
 {
     float normalise;
-    float ex, ey, ez;
+    float ex,ey,ez;
+    
+    /*½ÇËÙ¶È£¬¶È×ª»¡¶È*/
+//    mahony_filter->gyro.x *= DEG2RAD;        /* ¶È×ª»¡¶È */
+//    mahony_filter->gyro.y *= DEG2RAD;
+//    mahony_filter->gyro.z *= DEG2RAD;;
+       
+    /*µ¥Î»»¯¼ÓËÙ¼Æ²âÁ¿Öµ*/
+    normalise =sqrt(mahony_filter->acc.x * mahony_filter->acc.x 
+										+mahony_filter->acc.y * mahony_filter->acc.y 
+										+mahony_filter->acc.z * mahony_filter->acc.z);
+	
+    mahony_filter->acc.x =mahony_filter->acc.x/ normalise;
+	  mahony_filter->acc.y =mahony_filter->acc.y/normalise;   
+    mahony_filter->acc.z =mahony_filter->acc.z/normalise;
 
-    // åŠ é€Ÿåº¦ï¼Œå•ä½è½¬æ¢
-    // mahony_filter->gyro.x *= DEG2RAD;        // è½¬æ¢ä¸ºå¼§åº¦
-    // mahony_filter->gyro.y *= DEG2RAD;
-    // mahony_filter->gyro.z *= DEG2RAD;;
-
-    // å¯¹åŠ é€Ÿåº¦è®¡æµ‹é‡å€¼è¿›è¡Œå½’ä¸€åŒ–ï¼Œå¾—åˆ°é‡åŠ›åŠ é€Ÿåº¦çš„æ–¹å‘
-    normalise = sqrt(mahony_filter->acc.x * mahony_filter->acc.x + mahony_filter->acc.y * mahony_filter->acc.y + mahony_filter->acc.z * mahony_filter->acc.z);
-
-    mahony_filter->acc.x = mahony_filter->acc.x / normalise;
-    mahony_filter->acc.y = mahony_filter->acc.y / normalise;
-    mahony_filter->acc.z = mahony_filter->acc.z / normalise;
-
-    // åŠ é€Ÿåº¦è®¡è¯»å–çš„æ–¹å‘ä¸Žé‡åŠ›åŠ é€Ÿåº¦æ–¹å‘å‘é‡çš„å‰ç§¯ï¼Œè®¡ç®—è¯¯å·®å‘é‡
-    // vx=mahony_filter->rMat[2][0]=2.0f * (q1q3 + -q0q2)
-    // vy=mahony_filter->rMat[2][1]=2.0f * (q2q3 - -q0q1)
-    // vz=mahony_filter->rMat[2][2]=1.0f - 2.0f * q1q1 - 2.0f * q2q2
+    /*¼ÓËÙ¼Æ¶ÁÈ¡µÄ·½ÏòÓëÖØÁ¦¼ÓËÙ¼Æ·½ÏòµÄ²îÖµ£¬ÓÃÏòÁ¿²æ³Ë¼ÆËã*/
+	//vx=mahony_filter->rMat[2][0]=2.0f * (q1q3 + -q0q2)
+	//vy=mahony_filter->rMat[2][1]=2.0f * (q2q3 - -q0q1)
+	//vz=mahony_filter->rMat[2][2]=1.0f - 2.0f * q1q1 - 2.0f * q2q2
     ex = (mahony_filter->acc.y * mahony_filter->rMat[2][2] - mahony_filter->acc.z * mahony_filter->rMat[2][1]);
     ey = (mahony_filter->acc.z * mahony_filter->rMat[2][0] - mahony_filter->acc.x * mahony_filter->rMat[2][2]);
     ez = (mahony_filter->acc.x * mahony_filter->rMat[2][1] - mahony_filter->acc.y * mahony_filter->rMat[2][0]);
-
-    // è¯¯å·®ç´¯ç§¯ï¼Œå®žçŽ°ç§¯åˆ†è¡¥å¿
-    mahony_filter->exInt += mahony_filter->Ki * ex * mahony_filter->dt;
-    mahony_filter->eyInt += mahony_filter->Ki * ey * mahony_filter->dt;
-    mahony_filter->ezInt += mahony_filter->Ki * ez * mahony_filter->dt;
-
-    // ç”¨è¯¯å·®è¿›è¡ŒPIä¿®æ­£ï¼Œè¡¥å¿é™€èžºä»ªçš„æ¼‚ç§»è¯¯å·®
+    
+    /*Îó²îÀÛ¼Æ£¬Óë»ý·Ö³£ÊýÏà³Ë*/
+    mahony_filter->exInt += mahony_filter->Ki * ex * mahony_filter->dt ;  
+    mahony_filter->eyInt += mahony_filter->Ki * ey * mahony_filter->dt ;
+    mahony_filter->ezInt += mahony_filter->Ki * ez * mahony_filter->dt ;
+    
+    /*ÓÃ²æ»ýÎó²îÀ´×öPIÐÞÕýÍÓÂÝÁãÆ«£¬¼´µÖÏûÍÓÂÝ¶ÁÊýÖÐµÄÆ«ÒÆÁ¿*/
     mahony_filter->gyro.x += mahony_filter->Kp * ex + mahony_filter->exInt;
     mahony_filter->gyro.y += mahony_filter->Kp * ey + mahony_filter->eyInt;
     mahony_filter->gyro.z += mahony_filter->Kp * ez + mahony_filter->ezInt;
-
-    // ä¸€é˜¶é¾™æ ¼åº“å¡”æ³•ï¼Œå››å…ƒæ•°è¿åŠ¨å­¦æ–¹ç¨‹çš„ç¦»æ•£åŒ–å½¢å¼å’Œç§¯åˆ†è¿‘ä¼¼æ–¹æ³•ï¼Œæ›´æ–°å››å…ƒæ•°
+    
+    /* Ò»½×½üËÆËã·¨£¬ËÄÔªÊýÔË¶¯Ñ§·½³ÌµÄÀëÉ¢»¯ÐÎÊ½ºÍ»ý·Ö */
     float q0Last = mahony_filter->q0;
     float q1Last = mahony_filter->q1;
     float q2Last = mahony_filter->q2;
     float q3Last = mahony_filter->q3;
     float halfT = mahony_filter->dt * 0.5f;
     mahony_filter->q0 += (-q1Last * mahony_filter->gyro.x - q2Last * mahony_filter->gyro.y - q3Last * mahony_filter->gyro.z) * halfT;
-    mahony_filter->q1 += (q0Last * mahony_filter->gyro.x + q2Last * mahony_filter->gyro.z - q3Last * mahony_filter->gyro.y) * halfT;
-    mahony_filter->q2 += (q0Last * mahony_filter->gyro.y - q1Last * mahony_filter->gyro.z + q3Last * mahony_filter->gyro.x) * halfT;
-    mahony_filter->q3 += (q0Last * mahony_filter->gyro.z + q1Last * mahony_filter->gyro.y - q2Last * mahony_filter->gyro.x) * halfT;
-
-    // å½’ä¸€åŒ–å››å…ƒæ•°
-    normalise = sqrt(mahony_filter->q0 * mahony_filter->q0 + mahony_filter->q1 * mahony_filter->q1 + mahony_filter->q2 * mahony_filter->q2 + mahony_filter->q3 * mahony_filter->q3);
-
-    mahony_filter->q0 = mahony_filter->q0 / normalise;
-    mahony_filter->q1 = mahony_filter->q1 / normalise;
-    mahony_filter->q2 = mahony_filter->q2 / normalise;
-    mahony_filter->q3 = mahony_filter->q3 / normalise;
-
-    // æ›´æ–°æ—‹è½¬çŸ©é˜µ
+    mahony_filter->q1 += ( q0Last * mahony_filter->gyro.x + q2Last * mahony_filter->gyro.z - q3Last * mahony_filter->gyro.y) * halfT;
+    mahony_filter->q2 += ( q0Last * mahony_filter->gyro.y - q1Last * mahony_filter->gyro.z + q3Last * mahony_filter->gyro.x) * halfT;
+    mahony_filter->q3 += ( q0Last * mahony_filter->gyro.z + q1Last * mahony_filter->gyro.y - q2Last * mahony_filter->gyro.x) * halfT;
+    
+    /*µ¥Î»»¯ËÄÔªÊý*/
+    normalise = sqrt(mahony_filter->q0 * mahony_filter->q0 
+										+mahony_filter->q1 * mahony_filter->q1 
+										+mahony_filter->q2 * mahony_filter->q2 
+										+mahony_filter->q3 * mahony_filter->q3);
+												
+    mahony_filter->q0 = mahony_filter->q0/normalise;
+    mahony_filter->q1 = mahony_filter->q1/normalise;
+    mahony_filter->q2 = mahony_filter->q2/normalise;
+    mahony_filter->q3 = mahony_filter->q3/normalise;
+    
+    /*¼ÆËãÐý×ª¾ØÕó*/
     mahony_filter->RotationMatrix_update(mahony_filter);
 }
 
-// é€šè¿‡æ—‹è½¬çŸ©é˜µèŽ·å–å§¿æ€è§’
+// ´ÓÐý×ª¾ØÕóÖÐÌáÈ¡×ËÌ¬½Ç
 void mahony_output(struct MAHONY_FILTER_t *mahony_filter)
 {
-    // è®¡ç®—roll pitch yaw æ¬§æ‹‰è§’
-    mahony_filter->pitch = -asinf(mahony_filter->rMat[2][0]);
-    mahony_filter->roll = atan2f(mahony_filter->rMat[2][1], mahony_filter->rMat[2][2]);
-    mahony_filter->yaw = atan2f(mahony_filter->rMat[1][0], mahony_filter->rMat[0][0]);
+    /*¼ÆËãroll pitch yaw Å·À­½Ç*/
+    mahony_filter->pitch = -asinf(mahony_filter->rMat[2][0]); 
+    mahony_filter->roll = atan2f(mahony_filter->rMat[2][1], mahony_filter->rMat[2][2]) ;
+    mahony_filter->yaw = atan2f(mahony_filter->rMat[1][0], mahony_filter->rMat[0][0]) ;
 }
 
-// åˆå§‹åŒ–Mahonyæ»¤æ³¢å™¨çš„å‚æ•°å’Œå‡½æ•°æŒ‡é’ˆ
-void mahony_init(struct MAHONY_FILTER_t *mahony_filter, float Kp, float Ki, float dt)
+// ³õÊ¼»¯MahonyÂË²¨Æ÷µÄ²ÎÊýºÍº¯ÊýÖ¸Õë
+void mahony_init(struct MAHONY_FILTER_t *mahony_filter,float Kp,float Ki,float dt)
 {
     mahony_filter->Kp = Kp;
     mahony_filter->Ki = Ki;
@@ -113,6 +125,7 @@ void mahony_init(struct MAHONY_FILTER_t *mahony_filter, float Kp, float Ki, floa
     mahony_filter->q0 = 1;
     mahony_filter->mahony_input = mahony_input;
     mahony_filter->mahony_update = mahony_update;
-    mahony_filter->mahony_output = mahony_output;
+    mahony_filter->mahony_output = mahony_output;    
     mahony_filter->RotationMatrix_update = RotationMatrix_update;
 }
+

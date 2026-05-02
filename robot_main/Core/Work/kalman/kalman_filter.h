@@ -1,5 +1,18 @@
+/**
+ ******************************************************************************
+ * @file    kalman filter.h
+ * @author  Wang Hongxi
+ * @version V1.2.2
+ * @date    2022/1/8
+ * @brief
+ ******************************************************************************
+ * @attention
+ *
+ ******************************************************************************
+ */
 #ifndef __KALMAN_FILTER_H
 #define __KALMAN_FILTER_H
+
 
 #include "arm_math.h"
 
@@ -25,44 +38,44 @@
 
 typedef struct kf_t
 {
-    float *FilteredValue; // æ»¤æ³¢åçš„å€¼
-    float *MeasuredVector; // æµ‹é‡å‘é‡
-    float *ControlVector; // æ§åˆ¶å‘é‡
+    float *FilteredValue;
+    float *MeasuredVector;
+    float *ControlVector;
 
-    uint8_t xhatSize; // çŠ¶æ€å‘é‡ç»´åº¦
-    uint8_t uSize; // æ§åˆ¶å‘é‡ç»´åº¦
-    uint8_t zSize; // æµ‹é‡å‘é‡ç»´åº¦
+    uint8_t xhatSize;
+    uint8_t uSize;
+    uint8_t zSize;
 
-    uint8_t UseAutoAdjustment; // æ˜¯å¦å¯ç”¨è‡ªåŠ¨è°ƒæ•´
-    uint8_t MeasurementValidNum; // æœ‰æ•ˆæµ‹é‡æ•°é‡
+    uint8_t UseAutoAdjustment;
+    uint8_t MeasurementValidNum;
 
-    uint8_t *MeasurementMap;      // æµ‹é‡ä¸çŠ¶æ€çš„å…³ç³» how measurement relates to the state
-    float *MeasurementDegree;     // æµ‹é‡å€¼å¯¹åº”çš„HçŸ©é˜µå…ƒç´ å€¼ elements of each measurement in H
-    float *MatR_DiagonalElements; // æµ‹é‡æ–¹å·® variance for each measurement
-    float *StateMinVariance;      // æœ€å°æ–¹å·®ï¼ˆåæ–¹å·®ä¸‹ç•Œï¼‰æŠ‘åˆ¶æ»¤æ³¢å™¨è¿‡åº¦æ”¶æ•› suppress filter excessive convergence
+    uint8_t *MeasurementMap;      // Á¿²âÓë×´Ì¬µÄ¹ØÏµ how measurement relates to the state
+    float *MeasurementDegree;     // ²âÁ¿Öµ¶ÔÓ¦H¾ØÕóÔªËØÖµ elements of each measurement in H
+    float *MatR_DiagonalElements; // Á¿²â·½²î variance for each measurement
+    float *StateMinVariance;      // ×îĞ¡·½²î ±ÜÃâ·½²î¹ı¶ÈÊÕÁ² suppress filter excessive convergence
     uint8_t *temp;
 
-    // ä¾›ç”¨æˆ·è‡ªå®šä¹‰å‡½æ•°ä½¿ç”¨ï¼Œä½œä¸ºæ ‡å¿—ä½æ¥åˆ¤æ–­æ˜¯å¦éœ€è¦è·³è¿‡æ ‡å‡†KFå…¬å¼ä¸­çš„æŸä¸€æ­¥
+    // ÅäºÏÓÃ»§¶¨Òåº¯ÊıÊ¹ÓÃ,×÷Îª±êÖ¾Î»ÓÃÓÚÅĞ¶ÏÊÇ·ñÒªÌø¹ı±ê×¼KFÖĞÎå¸ö»·½ÚÖĞµÄÈÎÒâÒ»¸ö
     uint8_t SkipEq1, SkipEq2, SkipEq3, SkipEq4, SkipEq5;
 
     // definiion of struct mat: rows & cols & pointer to vars
-    mat xhat;          // x(k|k)
-    mat xhatminus;     // x(k|k-1)
-    mat u;             // control vector u
-    mat z;             // measurement vector z
-    mat P;             // covariance matrix P(k|k)
-    mat Pminus;        // covariance matrix P(k|k-1)
-    mat F, FT, temp_F; // state transition matrix F FT
-    mat B;             // control matrix B
-    mat H, HT;         // measurement matrix H
-    mat Q;             // process noise covariance matrix Q
-    mat R;             // measurement noise covariance matrix R
-    mat K;             // kalman gain  K
+    mat xhat;      // x(k|k)
+    mat xhatminus; // x(k|k-1)
+    mat u;         // control vector u
+    mat z;         // measurement vector z
+    mat P;         // covariance matrix P(k|k)
+    mat Pminus;    // covariance matrix P(k|k-1)
+    mat F, FT,temp_F;     // state transition matrix F FT
+    mat B;         // control matrix B
+    mat H, HT;     // measurement matrix H
+    mat Q;         // process noise covariance matrix Q
+    mat R;         // measurement noise covariance matrix R
+    mat K;         // kalman gain  K
     mat S, temp_matrix, temp_matrix1, temp_vector, temp_vector1;
 
     int8_t MatStatus;
 
-    // ç”¨æˆ·è‡ªå®šä¹‰å‡½æ•°ï¼Œå¯ç”¨äºæ›¿æ¢æˆ–æ‰©å±•æ ‡å‡†KFçš„åŠŸèƒ½
+    // ÓÃ»§¶¨Òåº¯Êı,¿ÉÒÔÌæ»»»òÀ©Õ¹»ù×¼KFµÄ¹¦ÄÜ
     void (*User_Func0_f)(struct kf_t *kf);
     void (*User_Func1_f)(struct kf_t *kf);
     void (*User_Func2_f)(struct kf_t *kf);
@@ -70,13 +83,13 @@ typedef struct kf_t
     void (*User_Func4_f)(struct kf_t *kf);
     void (*User_Func5_f)(struct kf_t *kf);
     void (*User_Func6_f)(struct kf_t *kf);
-
-    // æ•°æ®å­˜å‚¨ç©ºé—´æŒ‡é’ˆ
+    
+    // ¾ØÕó´æ´¢¿Õ¼äÖ¸Õë
     float *xhat_data, *xhatminus_data;
     float *u_data;
     float *z_data;
     float *P_data, *Pminus_data;
-    float *F_data, *FT_data, *temp_F_data;
+    float *F_data, *FT_data,*temp_F_data;
     float *B_data;
     float *H_data, *HT_data;
     float *Q_data;
@@ -96,4 +109,4 @@ void Kalman_Filter_xhatUpdate(KalmanFilter_t *kf);
 void Kalman_Filter_P_Update(KalmanFilter_t *kf);
 float *Kalman_Filter_Update(KalmanFilter_t *kf);
 
-#endif
+#endif //__KALMAN_FILTER_H

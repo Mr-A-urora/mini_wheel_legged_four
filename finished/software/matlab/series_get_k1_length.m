@@ -5,14 +5,16 @@ function K = series_get_k1_length(leg_length,ak)
 
     lw=polyval(ak,leg_length);  %求ak多项式在leg_length的值    %摆杆质心高度（以轮轴为原点）
     lb=leg_length+0.0072;               %机体质心高度
+    larm=leg_length+0.1;                %机械臂质心高度
     R1=0.049;                           %驱动轮半径
     mw1=0.294;                         %驱动轮质量
-    mb=1.43*0.5 ;                            %机体质量
+    marm=0.194*0.5;                         %机械臂质量
+    mb=1.43*0.5 ;                      %机体质量
     ml=0.144;                          %摆杆质量
-    mp1=mb+ml;                        %杆质量+机体
-    L1=(lb*mb+lw*ml)/mp1;           %总重心到驱动轮轴距离
+    mp1=mb+ml+marm;                        %杆质量+机体
+    L1=(lb*mb+lw*ml+larm*marm)/mp1;           %总重心到驱动轮轴距离
     Iw1=mw1*R1^2;                     %驱动轮转动惯量
-    Ip1=mb*(lb-L1)^2+ml*(L1-lw)^2; %摆杆转动惯量
+    Ip1=mb*(lb-L1)^2+ml*(L1-lw)^2+marm*(L1-larm)^2;     %摆杆转动惯量
    
     N = mp*diff(x + L*sin(theta),t,2);
     P = mp*g+mp*diff(L*cos(theta),t,2);

@@ -1,6 +1,9 @@
 #include "ins_task.h"
+
 #include "QuaternionEKF.h"
+
 #include "mahony_filter.h"
+
 #include "cmsis_os.h"
 #include "bsp_dwt.h"
 
@@ -56,17 +59,18 @@ void INS_task(void)
 		INS.q[2] = mahony.q2;
 		INS.q[3] = mahony.q3;
 
-		// 将重力矢量从地球坐标系n转换到机体坐标系b，从加速度计中减去重力得到运动加速度
+		// �������ӵ�������ϵnת��������ϵb,�����ݼ��ٶȼ����ݼ����˶����ٶ�
 		float gravity_b[3];
 		EarthFrameToBodyFrame(gravity, gravity_b, INS.q);
-		for (uint8_t i = 0; i < 3; i++) // ͬ同时进行一阶低通滤波
+		for (uint8_t i = 0; i < 3; i++) // ͬ����һ����ͨ�˲�
 		{
 			INS.MotionAccel_b[i] = (INS.Accel[i] - gravity_b[i]) * ins_dt / (INS.AccelLPF + ins_dt) + INS.MotionAccel_b[i] * INS.AccelLPF / (INS.AccelLPF + ins_dt);
-			// INS.MotionAccel_b[i] = (INS.Accel[i] ) * dt / (INS.AccelLPF + dt) + INS.MotionAccel_b[i] * INS.AccelLPF / (INS.AccelLPF + dt);
+			//			INS.MotionAccel_b[i] = (INS.Accel[i] ) * dt / (INS.AccelLPF + dt)
+			//														+ INS.MotionAccel_b[i] * INS.AccelLPF / (INS.AccelLPF + dt);
 		}
-		BodyFrameToEarthFrame(INS.MotionAccel_b, INS.MotionAccel_n, INS.q); // 转换回地球坐标系n
+		BodyFrameToEarthFrame(INS.MotionAccel_b, INS.MotionAccel_n, INS.q); // ת���ص���ϵn
 
-		// 运动加速度死区处理
+		// ��������
 		if (fabsf(INS.MotionAccel_n[0]) < 0.02f)
 		{
 			INS.MotionAccel_n[0] = 0.0f; // x��
@@ -82,8 +86,8 @@ void INS_task(void)
 
 		if (ins_time > 3000.0f)
 		{
-			INS.ins_flag = 1; // 四元数收敛完成，加速度计和陀螺仪数据已融合，可以开始积分
-			// 获取姿态角
+			INS.ins_flag = 1; // ��Ԫ���������������ٶ�Ҳ�������������Կ�ʼ��������
+			// ��ȡ��������
 			INS.Pitch = mahony.roll;
 			INS.Roll = mahony.pitch;
 			INS.Yaw = mahony.yaw;

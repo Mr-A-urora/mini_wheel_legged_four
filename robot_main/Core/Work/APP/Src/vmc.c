@@ -22,7 +22,7 @@ uint8_t jump_flag = 0;
 #define VMC_Locked_IQ 0.0f
 #define VMC_Init_Angle 1.256637f /*The Angle between the big_leg and the vertical*/
 VMC_t robot[2];
-float vmc_pid_param[3] = {500, 0, -5};
+float vmc_pid_param[3] = {1300, 0, -2};
 pid_type_def VMC_PID[2];
 float roll_set = 0;
 float roll_pid_param[3] = {-20, 0, 1};
@@ -42,8 +42,8 @@ void vmc_task(void)
     // 等待加速度收敛
     osDelay(1);
   }
-  PID_init(&VMC_PID[0], PID_POSITION, vmc_pid_param, 30.0f, 5.0f);
-  PID_init(&VMC_PID[1], PID_POSITION, vmc_pid_param, 30.0f, 5.0f);
+  PID_init(&VMC_PID[0], PID_POSITION, vmc_pid_param, 3000.0f, 10.0f);
+  PID_init(&VMC_PID[1], PID_POSITION, vmc_pid_param, 3000.0f, 10.0f);
   PID_init(&Roll_Contorl_PID, PID_POSITION, roll_pid_param, 5.0f, 1.0f);
   for (uint8_t i = 0; i < 5; i++)
   {
@@ -54,7 +54,7 @@ void vmc_task(void)
   }
   robot[0].Init_Position = chassis.Jointmotor[0].position_buck;
   robot[1].Init_Position = chassis.Jointmotor[1].position_buck;
-#ifdef LEG_Position
+  #ifdef LEG_Position
   Motor_Setmode(chassis.Jointmotor[0].id, CONTROL_MODE_POSITION_TRAP);
   osDelay(1);
   Motor_Setmode(chassis.Jointmotor[1].id, CONTROL_MODE_POSITION_TRAP);

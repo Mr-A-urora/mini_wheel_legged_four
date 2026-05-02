@@ -19,10 +19,9 @@ _Chassis_Param chassis = {
 
     .Wheelmotor[1].id = Wheel_Motor_Right_ID,
     .Wheelmotor[1].reduction_ratio = 1,
-
 };
 
-float turn_pid_param[3] = {2, 0, -0.2};
+float turn_pid_param[3] = {4, 0, -0.4};
 pid_type_def TURN_PID;
 float yaw_init;
 void Chassis_Param_Updata(void);
@@ -36,9 +35,9 @@ void Chassis_init(void)
     enable motor
     init PID
     */
+
     while (INS.ins_flag == 0)
-    { 
-        // 等待加速度收敛
+    { // 等待加速度收敛
         osDelay(1);
     }
     Init_Beep();
@@ -56,8 +55,10 @@ void Chassis_init(void)
 
 void Chassis_task(void)
 {
+
     Chassis_init();
 
+    /*init*/
     while (1)
     {
         if (xbox.btnStart_falling)
@@ -105,11 +106,11 @@ void Get_Control_Cur_Info(void)
 {
     chassis.pitch.cur = -INS.Pitch;
     chassis.d_pitch.cur = -INS.Gyro[0];
-    if (dx_flag == 1)
+    if(dx_flag==1)
     {
-        if (fabsf(chassis.v_filter.cur) < 0.2f)
+        if(fabsf(chassis.v_filter.cur) < 0.2f)
         {
-            dx_flag = 0;
+            dx_flag=0;
         }
     }
     if (dx_flag)
@@ -117,7 +118,6 @@ void Get_Control_Cur_Info(void)
         chassis.x_filter.cur = 0;
     }
 }
-
 void Get_Control_Tar_Info(void)
 {
     static uint8_t cnt = 0;
@@ -125,21 +125,20 @@ void Get_Control_Tar_Info(void)
     if (cnt++ > 10)
     {
         cnt = 0;
-        yaw_init += -xbox.joyLHori * 0.01 * 0.0004;
+        yaw_init += -xbox.joyLHori*0.01 * 0.0004;
     }
     // chassis.pitch.tar = -0.02-0.00016/(robot[0].virtual_leg_length_back+robot[1].virtual_leg_length_back)*0.5;
-    chassis.pitch.tar = -0.01;
+    chassis.pitch.tar = 0.0835;
     chassis.d_pitch.tar = 0;
 
-    chassis.v_filter.tar = xbox.joyLVert * 0.01 * 0.002;
-    if (chassis.v_filter.tar != 0)
+    chassis.v_filter.tar = xbox.joyLVert*0.01 * 0.002;
+    if(chassis.v_filter.tar!=0)
     {
-        dx_flag = 1;
+        dx_flag=1;
     }
     chassis.v_filter.tar = constrain(chassis.v_filter.tar, 1.5, -1.5);
     chassis.x_filter.tar = 0;
 }
-
 void Get_Control_Err_Info(void)
 {
     chassis.pitch.err = chassis.pitch.cur - chassis.pitch.tar;
@@ -154,11 +153,10 @@ void Chassis_Param_Updata(void)
     Get_Control_Cur_Info();
     Get_Control_Err_Info();
 }
-
 void Cal_Matrix(float *K_Matrix, float VL_Hight)
 {
-    K_Matrix[0] = 10.4307 * (VL_Hight * VL_Hight) + (-6.1513) * VL_Hight + (-3.7125);
-    K_Matrix[1] = (-0.3296) * (VL_Hight * VL_Hight) + (-1.1847) * VL_Hight + (-0.1723);
-    K_Matrix[2] = -0.3325;
-    K_Matrix[3] = (-11.9945) * (VL_Hight * VL_Hight) + (4.2445) * VL_Hight + (-1.3160);
+    K_Matrix[0] = 9.1733 * (VL_Hight * VL_Hight) + (-5.8375) * VL_Hight + (-3.8505);
+    K_Matrix[1] = (-0.8390) * (VL_Hight * VL_Hight) + (-1.0527) * VL_Hight + (-0.2086);
+    K_Matrix[2] = -0.6325;
+    K_Matrix[3] = (-8.9679) * (VL_Hight * VL_Hight) + (3.2208) * VL_Hight + (-1.2177);
 }

@@ -1,3 +1,15 @@
+/**
+ ******************************************************************************
+ * @file	bsp_dwt.c
+ * @author  Wang Hongxi
+ * @version V1.1.0
+ * @date    2022/3/8
+ * @brief
+ ******************************************************************************
+ * @attention
+ *
+ ******************************************************************************
+ */
 #include "bsp_dwt.h"
 
 DWT_Time_t SysTime;
@@ -9,13 +21,13 @@ static void DWT_CNT_Update(void);
 
 void DWT_Init(uint32_t CPU_Freq_mHz)
 {
-    // ä½¿ç”¨DWTè·Ÿè¸ª
+    /* Ê¹ÄÜDWTÍâÉè */
     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 
-    // DWT CYCCNTå¯„å­˜å™¨ä½¿èƒ½å¹¶æ¸…é›¶
+    /* DWT CYCCNT¼Ä´æÆ÷¼ÆÊýÇå0 */
     DWT->CYCCNT = (uint32_t)0u;
 
-    // ä½¿èƒ½Cortex-M DWT CYCCNTå¯„å­˜å™¨
+    /* Ê¹ÄÜCortex-M DWT CYCCNT¼Ä´æÆ÷ */
     DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 
     CPU_FREQ_Hz = CPU_Freq_mHz * 1000000;
@@ -94,7 +106,7 @@ static void DWT_CNT_Update(void)
     volatile uint32_t cnt_now = DWT->CYCCNT;
 
     if (cnt_now < CYCCNT_LAST)
-        CYCCNT_RountCount++; // æº¢å‡ºè®¡æ•°
+        CYCCNT_RountCount++;//Òç³ö
 
     CYCCNT_LAST = cnt_now;
 }
