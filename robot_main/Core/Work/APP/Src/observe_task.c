@@ -1,3 +1,18 @@
+/**
+  *********************************************************************
+  * @file      observe_task.c/h
+  * @brief     ¸ÃÈÎÎñÊÇ¶Ô»úÌåÔË¶¯ËÙ¶È¹À¼Æ£¬ÓÃÓÚÒÖÖÆ´ò»¬
+  * @note
+  * @history
+  *
+  @verbatim
+  ==============================================================================
+
+  ==============================================================================
+  @endverbatim
+  *********************************************************************
+  */
+
 #include "observe_task.h"
 
 #include "cmsis_os.h"
@@ -7,16 +22,16 @@
 
 #define Wheel_Radius 0.049f
 
-KalmanFilter_t vaEstimateKF; 
+KalmanFilter_t vaEstimateKF; // ¿¨¶ûÂüÂË²¨Æ÷½á¹¹Ìå
 
 float vaEstimateKF_F[4] = {1.0f, 0.003f,
-                           0.0f, 1.0f};
+                           0.0f, 1.0f}; // ×´Ì¬×ªÒÆ¾ØÕó£¬¿ØÖÆÖÜÆÚÎª0.001s
 
 float vaEstimateKF_P[4] = {1.0f, 0.0f,
-                           0.0f, 1.0f};
+                           0.0f, 1.0f}; // ºóÑé¹À¼ÆĞ­·½²î³õÊ¼Öµ
 
 float vaEstimateKF_Q[4] = {0.5f, 0.0f,
-                           0.0f, 0.5f};
+                           0.0f, 0.5f}; // Q¾ØÕó³õÊ¼Öµ
 
 float vaEstimateKF_R[4] = {100.0f, 0.0f,
                            0.0f, 100.0f};
@@ -24,17 +39,17 @@ float vaEstimateKF_R[4] = {100.0f, 0.0f,
 float vaEstimateKF_K[4];
 
 const float vaEstimateKF_H[4] = {1.0f, 0.0f,
-                                 0.0f, 1.0f};
+                                 0.0f, 1.0f}; // ÉèÖÃ¾ØÕóHÎª³£Á¿
 
 // extern vmc_leg_t right;
 // extern vmc_leg_t left;
 
 float vel_acc[2];
-uint32_t OBSERVE_TIME = 3;
+uint32_t OBSERVE_TIME = 3; // ÈÎÎñÖÜÆÚ
 void Observe_task(void)
 {
   while (INS.ins_flag == 0)
-  {
+  { // µÈ´ı¼ÓËÙ¶ÈÊÕÁ²
     osDelay(1);
   }
   static float wr, wl = 0.0f;
@@ -45,6 +60,7 @@ void Observe_task(void)
 
   while (1)
   {
+    //Ë³Ê±ÕëÎªÕı
 		 wr = -chassis.Wheelmotor[1].speed_buck - INS.Gyro[0];
 		 vrb = wr * Wheel_Radius;
 
@@ -52,13 +68,15 @@ void Observe_task(void)
 		 vlb = wl * Wheel_Radius;
 
 
-		 aver_v = (vrb - vlb) / 2.0f; // È¡Æ½ï¿½ï¿½
+		 aver_v = (vrb - vlb) / 2.0f; // È¡Æ½¾ù
 		 xvEstimateKF_Update(&vaEstimateKF, INS.MotionAccel_n[1], aver_v);
 
-		 chassis.v_filter.cur=vel_acc[0];
+		 //Ô­µØ×Ô×ªµÄ¹ı³ÌÖĞv_filterºÍx_filterÓ¦¸Ã¶¼ÊÇÎª0
+		 chassis.v_filter.cur=vel_acc[0];//µÃµ½¿¨¶ûÂüÂË²¨ºóµÄËÙ¶È
 		 chassis.x_filter.cur=chassis.x_filter.cur+chassis.v_filter.cur*((float)OBSERVE_TIME/1000.0f);
 
-//    chassis.v_filter.cur = (-chassis.Wheelmotor[1].speed_buck + chassis.Wheelmotor[0].speed_buck) * Wheel_Radius * 0.5f; // 0.0603ï¿½ï¿½ï¿½ï¿½ï¿½Ó°ë¾¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç½ï¿½ï¿½Ù¶È£ï¿½ï¿½Ë°ë¾¶ï¿½ï¿½Ãµï¿½ï¿½ï¿½ï¿½Ù¶È£ï¿½ï¿½ï¿½Ñ§Ä£ï¿½ï¿½ï¿½Ğ¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë³Ê±ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Ë¸ï¿½ï¿½ï¿½ï¿½ï¿½
+    // Èç¹ûÏëÖ±½ÓÓÃÂÖ×ÓËÙ¶È£¬²»×öÈÚºÏµÄ»°¿ÉÒÔÕâÑù
+//    chassis.v_filter.cur = (-chassis.Wheelmotor[1].speed_buck + chassis.Wheelmotor[0].speed_buck) * Wheel_Radius * 0.5f; // 0.0603ÊÇÂÖ×Ó°ë¾¶£¬µç»ú·´À¡µÄÊÇ½ÇËÙ¶È£¬³Ë°ë¾¶ºóµÃµ½ÏßËÙ¶È£¬ÊıÑ§Ä£ĞÍÖĞ¶¨ÒåµÄÊÇÂÖ×ÓË³Ê±ÕëÎªÕı£¬ËùÒÔÒª³Ë¸ö¸ººÅ
 //    chassis.x_filter.cur = chassis.x_filter.cur + chassis.v_filter.cur * ((float)OBSERVE_TIME / 1000.0f);
 
     osDelay(OBSERVE_TIME);
@@ -67,7 +85,7 @@ void Observe_task(void)
 
 void xvEstimateKF_Init(KalmanFilter_t *EstimateKF)
 {
-  Kalman_Filter_Init(EstimateKF, 2, 0, 2); // ×´Ì¬ï¿½ï¿½ï¿½ï¿½2Î¬ Ã»ï¿½Ğ¿ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½2Î¬
+  Kalman_Filter_Init(EstimateKF, 2, 0, 2); // ×´Ì¬ÏòÁ¿2Î¬ Ã»ÓĞ¿ØÖÆÁ¿ ²âÁ¿ÏòÁ¿2Î¬
 
   memcpy(EstimateKF->F_data, vaEstimateKF_F, sizeof(vaEstimateKF_F));
   memcpy(EstimateKF->P_data, vaEstimateKF_P, sizeof(vaEstimateKF_P));
@@ -78,11 +96,14 @@ void xvEstimateKF_Init(KalmanFilter_t *EstimateKF)
 
 void xvEstimateKF_Update(KalmanFilter_t *EstimateKF, float acc, float vel)
 {
-  EstimateKF->MeasuredVector[0] = vel;
-  EstimateKF->MeasuredVector[1] = acc;
+  // ¿¨¶ûÂüÂË²¨Æ÷²âÁ¿Öµ¸üĞÂ
+  EstimateKF->MeasuredVector[0] = vel; // ²âÁ¿ËÙ¶È
+  EstimateKF->MeasuredVector[1] = acc; // ²âÁ¿¼ÓËÙ¶È
 
+  // ¿¨¶ûÂüÂË²¨Æ÷¸üĞÂº¯Êı
   Kalman_Filter_Update(EstimateKF);
 
+  // ÌáÈ¡¹À¼ÆÖµ
   for (uint8_t i = 0; i < 2; i++)
   {
     vel_acc[i] = EstimateKF->FilteredValue[i];

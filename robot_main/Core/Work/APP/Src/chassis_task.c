@@ -19,9 +19,10 @@ _Chassis_Param chassis = {
 
     .Wheelmotor[1].id = Wheel_Motor_Right_ID,
     .Wheelmotor[1].reduction_ratio = 1,
+
 };
 
-float turn_pid_param[3] = {4, 0, -0.4};
+float turn_pid_param[3] = {2, 0, -0.2};
 pid_type_def TURN_PID;
 float yaw_init;
 void Chassis_Param_Updata(void);
@@ -73,12 +74,12 @@ void Chassis_task(void)
 
         chassis.Wheelmotor[0].torque_set = (chassis.Wheel_Motor_K_Matrix[0][0] * chassis.pitch.err + chassis.Wheel_Motor_K_Matrix[0][1] * chassis.d_pitch.err + chassis.Wheel_Motor_K_Matrix[0][2] * chassis.x_filter.err + chassis.Wheel_Motor_K_Matrix[0][3] * chassis.v_filter.err);
         chassis.Wheelmotor[1].torque_set = (chassis.Wheel_Motor_K_Matrix[1][0] * chassis.pitch.err + chassis.Wheel_Motor_K_Matrix[1][1] * chassis.d_pitch.err + chassis.Wheel_Motor_K_Matrix[1][2] * chassis.x_filter.err + chassis.Wheel_Motor_K_Matrix[1][3] * chassis.v_filter.err);
-        // chassis.Wheelmotor[0].torque_set = (K_Matrix[0] * chassis.pitch.err + K_Matrix[1] * chassis.d_pitch.err + K_Matrix[2] * chassis.x_filter.err + K_Matrix[3] * chassis.v_filter.err);
-        // chassis.Wheelmotor[1].torque_set = (K_Matrix[0] * chassis.pitch.err + K_Matrix[1] * chassis.d_pitch.err + K_Matrix[2] * chassis.x_filter.err + K_Matrix[3] * chassis.v_filter.err);
+        //				 chassis.Wheelmotor[0].torque_set = (K_Matrix[0] * chassis.pitch.err + K_Matrix[1] * chassis.d_pitch.err + K_Matrix[2] * chassis.x_filter.err + K_Matrix[3] * chassis.v_filter.err);
+        //				 chassis.Wheelmotor[1].torque_set = (K_Matrix[0] * chassis.pitch.err + K_Matrix[1] * chassis.d_pitch.err + K_Matrix[2] * chassis.x_filter.err + K_Matrix[3] * chassis.v_filter.err);
 
         Angle_PID_calc(&TURN_PID, INS.YawTotalAngle, yaw_init, INS.Gyro[2]);
-        chassis.Wheelmotor[0].iq_set = +(WheelMotor_Torque2Iq(chassis.Wheelmotor[0].torque_set) + TURN_PID.out);
-        chassis.Wheelmotor[1].iq_set = -(WheelMotor_Torque2Iq(chassis.Wheelmotor[1].torque_set) - TURN_PID.out);
+        chassis.Wheelmotor[0].iq_set = -(WheelMotor_Torque2Iq(chassis.Wheelmotor[0].torque_set) - TURN_PID.out);
+        chassis.Wheelmotor[1].iq_set = +(WheelMotor_Torque2Iq(chassis.Wheelmotor[1].torque_set) + TURN_PID.out);
         if ((robot[0].liftoff_flag & robot[1].liftoff_flag) == 1)
         {
             chassis.Wheelmotor[0].iq_set = 0;
@@ -127,8 +128,8 @@ void Get_Control_Tar_Info(void)
         cnt = 0;
         yaw_init += -xbox.joyLHori*0.01 * 0.0004;
     }
-    // chassis.pitch.tar = -0.02-0.00016/(robot[0].virtual_leg_length_back+robot[1].virtual_leg_length_back)*0.5;
-    chassis.pitch.tar = 0.0835;
+    //    chassis.pitch.tar = -0.02-0.00016/(robot[0].virtual_leg_length_back+robot[1].virtual_leg_length_back)*0.5;
+    chassis.pitch.tar = 0.0;
     chassis.d_pitch.tar = 0;
 
     chassis.v_filter.tar = xbox.joyLVert*0.01 * 0.002;
@@ -155,8 +156,8 @@ void Chassis_Param_Updata(void)
 }
 void Cal_Matrix(float *K_Matrix, float VL_Hight)
 {
-    K_Matrix[0] = 9.1733 * (VL_Hight * VL_Hight) + (-5.8375) * VL_Hight + (-3.8505);
-    K_Matrix[1] = (-0.8390) * (VL_Hight * VL_Hight) + (-1.0527) * VL_Hight + (-0.2086);
-    K_Matrix[2] = -0.6325;
-    K_Matrix[3] = (-8.9679) * (VL_Hight * VL_Hight) + (3.2208) * VL_Hight + (-1.2177);
+    K_Matrix[0] = 10.4307 * (VL_Hight * VL_Hight) + (-6.1513) * VL_Hight + (-3.7125);
+    K_Matrix[1] = (-0.3296) * (VL_Hight * VL_Hight) + (-1.1847) * VL_Hight + (-0.1723);
+    K_Matrix[2] = -0.3325;
+    K_Matrix[3] = (-11.9945) * (VL_Hight * VL_Hight) + (4.2445) * VL_Hight + (-1.3160);
 }

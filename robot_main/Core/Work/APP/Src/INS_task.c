@@ -1,3 +1,18 @@
+/**
+  *********************************************************************
+  * @file      ins_task.c/h
+  * @brief     该任务是用mahony方法获取机体姿态，同时获取机体在绝对坐标系下的运动加速度
+  * @note
+  * @history
+  *
+  @verbatim
+  ==============================================================================
+
+  ==============================================================================
+  @endverbatim
+  *********************************************************************
+  */
+
 #include "ins_task.h"
 
 #include "QuaternionEKF.h"
@@ -59,35 +74,35 @@ void INS_task(void)
 		INS.q[2] = mahony.q2;
 		INS.q[3] = mahony.q3;
 
-		// 锟斤拷锟斤拷锟斤拷锟接碉拷锟斤拷锟斤拷锟斤拷系n转锟斤拷锟斤拷锟斤拷锟斤拷系b,锟斤拷锟斤拷锟捷硷拷锟劫度硷拷锟斤拷锟捷硷拷锟斤拷锟剿讹拷锟斤拷锟劫讹拷
+		// 将重力从导航坐标系n转换到机体系b,随后根据加速度计数据计算运动加速度
 		float gravity_b[3];
 		EarthFrameToBodyFrame(gravity, gravity_b, INS.q);
-		for (uint8_t i = 0; i < 3; i++) // 同锟斤拷锟斤拷一锟斤拷锟斤拷通锟剿诧拷
+		for (uint8_t i = 0; i < 3; i++) // 同样过一个低通滤波
 		{
 			INS.MotionAccel_b[i] = (INS.Accel[i] - gravity_b[i]) * ins_dt / (INS.AccelLPF + ins_dt) + INS.MotionAccel_b[i] * INS.AccelLPF / (INS.AccelLPF + ins_dt);
 			//			INS.MotionAccel_b[i] = (INS.Accel[i] ) * dt / (INS.AccelLPF + dt)
 			//														+ INS.MotionAccel_b[i] * INS.AccelLPF / (INS.AccelLPF + dt);
 		}
-		BodyFrameToEarthFrame(INS.MotionAccel_b, INS.MotionAccel_n, INS.q); // 转锟斤拷锟截碉拷锟斤拷系n
+		BodyFrameToEarthFrame(INS.MotionAccel_b, INS.MotionAccel_n, INS.q); // 转换回导航系n
 
-		// 锟斤拷锟斤拷锟斤拷锟斤拷
+		// 死区处理
 		if (fabsf(INS.MotionAccel_n[0]) < 0.02f)
 		{
-			INS.MotionAccel_n[0] = 0.0f; // x锟斤拷
+			INS.MotionAccel_n[0] = 0.0f; // x轴
 		}
 		if (fabsf(INS.MotionAccel_n[1]) < 0.02f)
 		{
-			INS.MotionAccel_n[1] = 0.0f; // y锟斤拷
+			INS.MotionAccel_n[1] = 0.0f; // y轴
 		}
 		if (fabsf(INS.MotionAccel_n[2]) < 0.04f)
 		{
-			INS.MotionAccel_n[2] = 0.0f; // z锟斤拷
+			INS.MotionAccel_n[2] = 0.0f; // z轴
 		}
 
 		if (ins_time > 3000.0f)
 		{
-			INS.ins_flag = 1; // 锟斤拷元锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟劫讹拷也锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟皆匡拷始锟斤拷锟斤拷锟斤拷锟斤拷
-			// 锟斤拷取锟斤拷锟斤拷锟斤拷锟斤拷
+			INS.ins_flag = 1; // 四元数基本收敛，加速度也基本收敛，可以开始底盘任务
+			// 获取最终数据
 			INS.Pitch = mahony.roll;
 			INS.Roll = mahony.pitch;
 			INS.Yaw = mahony.yaw;
