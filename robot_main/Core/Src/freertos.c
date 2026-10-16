@@ -22,7 +22,6 @@
 #include "task.h"
 #include "main.h"
 #include "cmsis_os.h"
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "ins_task.h"
@@ -232,10 +231,9 @@ void StartDefaultTask(void *argument)
   {
     if (uart1_rx_ok_flag)
     {
-
       uart1_rx_ok_flag = 0;
+      // $SET /test/p 0.009A*/\r\n
       printf("\r\n\r\n-- [DEFS] new frame --\r\n");
-      //		$SET /test/p 0.009A*/\r\n
       for (int j = 0; j < uart1_rx_len; j++)
       {
         if (parser.PushChar2RawBuf(&parser, uart1_rx_buf[j]))
@@ -245,7 +243,6 @@ void StartDefaultTask(void *argument)
             if (parser.Parse(&parser))
             {
               parser.parsed_value = atof(parser.payload.value);
-							// MatchThenSet_FLOAT(&parser, "/data/1", &joint_angle, NULL);
               MatchThenSet_FLOAT(&parser, "/pitch/0", &chassis.pitch.tar, NULL);
               MatchThenSet_FLOAT(&parser, "/K_Matrix/0", &K_Matrix[0], NULL);
 							MatchThenSet_FLOAT(&parser, "/K_Matrix/1", &K_Matrix[1], NULL);
@@ -265,18 +262,15 @@ void StartDefaultTask(void *argument)
         }
       }
       HAL_UART_Receive_DMA(&huart1, uart1_rx_buf, 100);
-
-      
     }
 
     printf("%.1f\n%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\n",vbus,robot[0].d_virtual_leg_length,robot[1].d_virtual_leg_length,robot[0].virtual_leg_length_back,robot[1].virtual_leg_length_back,robot[0].virtual_support_force_back,robot[1].virtual_support_force_back);
-//			printf("%.3f,%.3f,%.3f,%.3f\n",K_Matrix[0],K_Matrix[1],K_Matrix[2],K_Matrix[3]);
+//		printf("%.3f,%.3f,%.3f,%.3f\n",K_Matrix[0],K_Matrix[1],K_Matrix[2],K_Matrix[3]);
 //		printf("%.2f,%.2f\n",INS.Pitch,robot[0].virtual_leg_length_back);
-//			printf("%.2f,%.2f,%.2f,%.2f,%.2f\n",vbus,INS.Roll,VMC_PID[0].out,VMC_PID[1].out,Roll_Contorl_PID.out);
-//			printf("%.3f,%.3f,%.5f,%.5f,%.3f,%.3f\n",chassis.pitch.err,chassis.d_pitch.err,chassis.x_filter.err,chassis.v_filter.err,robot[0].virtual_support_force_back,robot[1].virtual_support_force_back);
-//			printf("%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\n",TURN_PID.out,yaw_init,INS.YawTotalAngle,INS.Gyro[2],TURN_PID.Kp,TURN_PID.Kd);
+//		printf("%.2f,%.2f,%.2f,%.2f,%.2f\n",vbus,INS.Roll,VMC_PID[0].out,VMC_PID[1].out,Roll_Contorl_PID.out);
+//		printf("%.3f,%.3f,%.5f,%.5f,%.3f,%.3f\n",chassis.pitch.err,chassis.d_pitch.err,chassis.x_filter.err,chassis.v_filter.err,robot[0].virtual_support_force_back,robot[1].virtual_support_force_back);
+//	  printf("%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\n",TURN_PID.out,yaw_init,INS.YawTotalAngle,INS.Gyro[2],TURN_PID.Kp,TURN_PID.Kd);
 //		printf("%.3f,%.3f",chassis.Jointmotor[0].iq_set,INS.Roll);
-
 //		printf("%.3f,%.3f,%.3f,%.3f\n",robot[0].virtual_support_force_back,robot[1].virtual_support_force_back,robot[0].JointForce_Virtual2Real_K,robot[1].JointForce_Virtual2Real_K);
     osDelay(100);
   }
@@ -330,13 +324,13 @@ void StartTask_Chassis(void *argument)
 void StartTask_LED(void *argument)
 {
   /* USER CODE BEGIN StartTask_LED */
-  Init_Servo();
+  // Init_Servo();
   Init_Ws2812();
 	osDelay(500);
   /* Infinite loop */
   for(;;)
   {
-    Servo_task();
+    // Servo_task();
     Ws2812_task();
 		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
     osDelay(100);
@@ -395,7 +389,7 @@ void StartTask_adc(void *argument)
   for(;;)
   {
 		HAL_ADC_Start(&hadc1);
-		HAL_ADC_PollForConversion(&hadc1,8);//??????
+		HAL_ADC_PollForConversion(&hadc1, 8);
 		Vbus_adc = HAL_ADC_GetValue(&hadc1);
 		HAL_ADC_Stop(&hadc1);
 		vbus=Vbus_adc*3.3/65536*11;
@@ -459,27 +453,27 @@ void StartTask_usb(void *argument)
   {
     if(usb_rx_flag)
     {
-    usb_rx_flag=0;
-		if(usb_rx_buf[0]==7 && memcmp(imu_check,usb_rx_buf+1,7)==0)
-		{
-		  vTaskSuspend(myTask_imuHandle);
-      len=sprintf((char*)usb_tx_buf,"start imu check\n");
-      CDC_Transmit_HS(usb_tx_buf,len);
-			osDelay(100);
-			while (BMI088_init(&hspi1, 1) != BMI088_NO_ERROR)
+      usb_rx_flag=0;
+      if(usb_rx_buf[0]==7 && memcmp(imu_check,usb_rx_buf+1,7)==0)
       {
-        ;
+        vTaskSuspend(myTask_imuHandle);
+        len=sprintf((char*)usb_tx_buf,"start imu check\n");
+        CDC_Transmit_HS(usb_tx_buf,len);
+        osDelay(100);
+        while (BMI088_init(&hspi1, 1) != BMI088_NO_ERROR)
+        {
+          ;
+        }
+      len=sprintf((char*)usb_tx_buf,"BMI088_Offset-->>\nGyro:\n%.12f\n%.12f\n%.12f\nAccel:\n%.12f\n%.12f\n%.12f\nPlease save and reboot",BMI088.GyroOffset[0],BMI088.GyroOffset[1],BMI088.GyroOffset[2],BMI088.AccelOffset[0],BMI088.AccelOffset[1],BMI088.AccelOffset[2]);
+      CDC_Transmit_HS(usb_tx_buf,len);    
       }
-    len=sprintf((char*)usb_tx_buf,"BMI088_Offset-->>\nGyro:\n%.12f\n%.12f\n%.12f\nAccel:\n%.12f\n%.12f\n%.12f\nPlease save and reboot",BMI088.GyroOffset[0],BMI088.GyroOffset[1],BMI088.GyroOffset[2],BMI088.AccelOffset[0],BMI088.AccelOffset[1],BMI088.AccelOffset[2]);
-		CDC_Transmit_HS(usb_tx_buf,len);    
-		}
     }
     else
     {
-            len=sprintf((char*)usb_tx_buf,"INS: %.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",
-                 INS.Accel[0],INS.Accel[1],INS.Accel[2],
-                 INS.Gyro[0],INS.Gyro[1],INS.Gyro[2]);
-      		CDC_Transmit_HS(usb_tx_buf,len);   
+      len=sprintf((char*)usb_tx_buf,"INS: %.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",
+                  INS.Accel[0],INS.Accel[1],INS.Accel[2],
+                  INS.Gyro[0],INS.Gyro[1],INS.Gyro[2]);
+      CDC_Transmit_HS(usb_tx_buf,len);   
     }
 
     osDelay(500);

@@ -9,7 +9,6 @@ void DEFS_Init(DEFS_Parser_t* self, char char_header, char _is_report)
 	self->Reset(self);
 }
 
-
 void DEFS_Reset(DEFS_Parser_t* self)
 {
 	self->cur_raw_buf_length = 0;
@@ -23,7 +22,6 @@ void DEFS_Reset(DEFS_Parser_t* self)
 	self->ClearPayload(self);
 }
 
-
 unsigned char DEFS_SetRawBuf(DEFS_Parser_t* self, const char* data_buf)
 {
 	unsigned short temp_len = strlen(data_buf);
@@ -33,7 +31,6 @@ unsigned char DEFS_SetRawBuf(DEFS_Parser_t* self, const char* data_buf)
 	memcpy(self->buf_raw, data_buf, self->cur_raw_buf_length);
 	return 1;
 }
-
 
 unsigned char DEFS_PushChar2RawBuf(DEFS_Parser_t* self, char ch)
 {
@@ -71,7 +68,6 @@ unsigned char DEFS_PushChar2RawBuf(DEFS_Parser_t* self, char ch)
 	}
 }
 
-
 unsigned char DEFS_Verify(DEFS_Parser_t* self)
 {
 	char* p = self->buf_raw;
@@ -102,7 +98,6 @@ unsigned char DEFS_Verify(DEFS_Parser_t* self)
 //	}
 }
 
-
 unsigned char DEFS_Parse(DEFS_Parser_t* self)
 {
 	int i;
@@ -125,7 +120,6 @@ unsigned char DEFS_Parse(DEFS_Parser_t* self)
 			printf("[DEFS] parse failed!\r\n");
 		return 0;
 	}
-		
 
 	memcpy(self->payload.cmd, self->buf_raw + 1, space_index[0] - 1);
 	memcpy(self->payload.path, self->buf_raw + space_index[0] + 1, space_index[1] - space_index[0] - 1);
@@ -139,14 +133,12 @@ unsigned char DEFS_Parse(DEFS_Parser_t* self)
 	return 1;
 }
 
-
 void DEFS_ClearPayload(DEFS_Parser_t* self)
 {
 	memset(self->payload.cmd, '\0', 8);
 	memset(self->payload.path, '\0', DEFS_MAX_BUF_SIZE);
 	memset(self->payload.value, '\0', 16);
 }
-
 
 char MatchThenSet_FLOAT(DEFS_Parser_t* parser, const char* path, float* val, void(*SetSuccessHook)(void))
 {
@@ -160,7 +152,6 @@ char MatchThenSet_FLOAT(DEFS_Parser_t* parser, const char* path, float* val, voi
 	return 0;
 }
 
-
 char MatchThenSet_U8(DEFS_Parser_t* parser, const char* path, unsigned char* val, void(*SetSuccessHook)(void))
 {
 	if (strcmp(parser->payload.path, path) == 0)
@@ -173,7 +164,6 @@ char MatchThenSet_U8(DEFS_Parser_t* parser, const char* path, unsigned char* val
 	return 0;
 }
 
-
 char MatchThenSet_U16(DEFS_Parser_t* parser, const char* path, unsigned short* val, void(*SetSuccessHook)(void))
 {
 	if (strcmp(parser->payload.path, path) == 0)
@@ -185,8 +175,6 @@ char MatchThenSet_U16(DEFS_Parser_t* parser, const char* path, unsigned short* v
 	}
 	return 0;
 }
-
-
 
 char MatchThenSet_SHORT(DEFS_Parser_t* parser, const char* path, short* val, void(*SetSuccessHook)(void))
 {

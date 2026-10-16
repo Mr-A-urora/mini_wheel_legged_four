@@ -300,7 +300,7 @@ void USART1_IRQHandler(void)
     HAL_UART_DMAStop(&huart1);
     uart1_rx_len = 100 - __HAL_DMA_GET_COUNTER(&hdma_usart1_rx);
     uart1_rx_ok_flag = 1;
-    HAL_UART_Receive_DMA(&huart1, uart1_rx_buf, 100); //????DMA
+    HAL_UART_Receive_DMA(&huart1, uart1_rx_buf, 100);
   }
   /* USER CODE END USART1_IRQn 1 */
 }
@@ -318,7 +318,6 @@ void UART4_IRQHandler(void)
   uint8_t tmp_flag = __HAL_UART_GET_FLAG(&huart4, UART_FLAG_IDLE);
   if ((tmp_flag != RESET))
   {
-
     __HAL_UART_CLEAR_IDLEFLAG(&huart4);
     HAL_UART_DMAStop(&huart4);
     uint8_t temp = __HAL_DMA_GET_COUNTER(&hdma_uart4_rx);
@@ -327,7 +326,7 @@ void UART4_IRQHandler(void)
 		if(rx_len==16)
 		Xbox_rx_buf_Handle(rx_buffer);
 
-    HAL_UART_Receive_DMA(&huart4, rx_buffer, 100); //????DMA
+    HAL_UART_Receive_DMA(&huart4, rx_buffer, 100);
   }
   /* USER CODE END UART4_IRQn 1 */
 }

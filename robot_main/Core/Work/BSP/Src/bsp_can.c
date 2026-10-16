@@ -94,20 +94,20 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
     Motorparam_updata(&chassis.Wheelmotor[1], CAN1_RxData, 8);
     break;
   case Can_Motor_erro(Joint_Motor_Left_ID):
-  chassis.Jointmotor[0].error_code = data_to_int(CAN1_RxData);
-  chassis.Jointmotor[0].error_status = 1;
+    chassis.Jointmotor[0].error_code = data_to_int(CAN1_RxData);
+    chassis.Jointmotor[0].error_status = 1;
     break;
   case Can_Motor_erro(Joint_Motor_Right_ID):
-  chassis.Jointmotor[1].error_code = data_to_int(CAN1_RxData);
-  chassis.Jointmotor[1].error_status = 1;
+    chassis.Jointmotor[1].error_code = data_to_int(CAN1_RxData);
+    chassis.Jointmotor[1].error_status = 1;
     break;
   case Can_Whell_erro(Wheel_Motor_Left_ID):
-  chassis.Wheelmotor[0].error_code = data_to_int(CAN1_RxData);  
-  chassis.Wheelmotor[0].error_status = 1;
+    chassis.Wheelmotor[0].error_code = data_to_int(CAN1_RxData);  
+    chassis.Wheelmotor[0].error_status = 1;
     break;
   case Can_Whell_erro(Wheel_Motor_Right_ID):
-  chassis.Wheelmotor[1].error_code = data_to_int(CAN1_RxData);
-  chassis.Wheelmotor[1].error_status = 1;
+    chassis.Wheelmotor[1].error_code = data_to_int(CAN1_RxData);
+    chassis.Wheelmotor[1].error_status = 1;
     break;
   default:
     break;

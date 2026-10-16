@@ -8,7 +8,6 @@ SPI_HandleTypeDef *BMI088_SPI;
 #define GYRO_CS_Pin GPIO_PIN_4
 #define GYRO_CS_GPIO_Port GPIOA
 
-
 void BMI088_ACCEL_NS_L(void)
 {
     HAL_GPIO_WritePin(ACC_CS_GPIO_Port, ACC_CS_Pin, GPIO_PIN_RESET);

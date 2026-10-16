@@ -5,11 +5,10 @@
 #include "bsp_motor.h"
 #include "pid.h"
 
-#define Joint_Motor_Left_ID 2
-#define Joint_Motor_Right_ID 1
+#define Joint_Motor_Left_ID 1
+#define Joint_Motor_Right_ID 2
 #define Wheel_Motor_Left_ID 3
 #define Wheel_Motor_Right_ID 4
-
 
 typedef struct control
 {

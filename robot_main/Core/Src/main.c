@@ -54,7 +54,6 @@ uint8_t uart1_rx_buf[100];
 uint8_t uart1_rx_ok_flag;
 uint8_t uart1_rx_len;
 uint8_t rx_buffer[100];
-
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -119,7 +118,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 	HAL_ADCEx_Calibration_Start(&hadc1, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED);
   HAL_TIM_PWM_Start(&htim15,TIM_CHANNEL_1);
-   __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);  
+  __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);  
   HAL_UART_Receive_DMA(&huart1, uart1_rx_buf, 100);  
   __HAL_UART_ENABLE_IT(&huart4, UART_IT_IDLE);  
   HAL_UART_Receive_DMA(&huart4, rx_buffer, 100); 

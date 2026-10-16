@@ -22,7 +22,7 @@ uint8_t jump_flag=0;
 #define VMC_Locked_IQ 0.0f
 #define VMC_Init_Angle 1.256637f /*The Angle between the big_leg and the vertical*/
 VMC_t robot[2];
-float vmc_pid_param[3] = {500, 0, -5};
+float vmc_pid_param[3] = {290, 0, -5};
 pid_type_def VMC_PID[2];
 float roll_set = 0;
 float roll_pid_param[3] = {-20, 0, 1};
@@ -127,12 +127,14 @@ void vmc_task(void)
 
     if (jump_flag == 1)
     {
+      const float jump_support_scale = 0.85f;
+
       chassis.v_filter.err=0;
       chassis.x_filter.err=0;
       VMC_PID[0].out=constrain(VMC_PID[0].out,30.0,-30.0);
       VMC_PID[1].out=constrain(VMC_PID[1].out,30.0,-30.0);
-      chassis.Jointmotor[0].iq_set = JointMotor_Torque2Iq((Robot_Body_Weight + VMC_PID[0].out + Roll_Contorl_PID.out) * robot[0].JointForce_Virtual2Real_K);
-      chassis.Jointmotor[1].iq_set = JointMotor_Torque2Iq((Robot_Body_Weight + VMC_PID[1].out - Roll_Contorl_PID.out) * robot[1].JointForce_Virtual2Real_K);
+      chassis.Jointmotor[0].iq_set = JointMotor_Torque2Iq((Robot_Body_Weight * jump_support_scale + VMC_PID[0].out + Roll_Contorl_PID.out) * robot[0].JointForce_Virtual2Real_K);
+      chassis.Jointmotor[1].iq_set = JointMotor_Torque2Iq((Robot_Body_Weight * jump_support_scale + VMC_PID[1].out - Roll_Contorl_PID.out) * robot[1].JointForce_Virtual2Real_K);
         switch (step)
         {
         case 0:
@@ -282,6 +284,7 @@ float Get_JointForce_Virtual2Real_K(float Joint_angle) /*平衡时，支持力�
 
   //  return J;
 }
+
 void VMC_Param_Updata(VMC_t *vmc, _Motor_Param *motor)
 {
   vmc->theat = (VMC_Init_Angle - (fabsf(motor->position_buck - vmc->Init_Position)));
