@@ -1,0 +1,2 @@
+# Keep this required prebuilt DSP library despite the repository-wide *.lib rule.
+!arm_cortexM7lfdp_math.lib

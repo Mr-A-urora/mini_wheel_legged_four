@@ -22,6 +22,7 @@
 #include "task.h"
 #include "main.h"
 #include "cmsis_os.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "ins_task.h"
@@ -324,13 +325,13 @@ void StartTask_Chassis(void *argument)
 void StartTask_LED(void *argument)
 {
   /* USER CODE BEGIN StartTask_LED */
-  // Init_Servo();
+  Init_Servo();
   Init_Ws2812();
 	osDelay(500);
   /* Infinite loop */
   for(;;)
   {
-    // Servo_task();
+    Servo_task();
     Ws2812_task();
 		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
     osDelay(100);
@@ -445,10 +446,11 @@ void StartTask_motorError(void *argument)
 /* USER CODE END Header_StartTask_usb */
 void StartTask_usb(void *argument)
 {
-  uint16_t len;
-	char imu_check[10]={"imu set"};
   /* USER CODE BEGIN StartTask_usb */
   /* Infinite loop */
+  uint16_t len;
+	char imu_check[10]={"imu set"};
+  
   for(;;)
   {
     if(usb_rx_flag)
